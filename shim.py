@@ -30,9 +30,10 @@ class H(BaseHTTPRequestHandler):
                 cmd = ["wacli","--store","/data/store","send","text","--to",to,"--message",body.get("text",""),"--json"]
             elif self.path == "/send-file":
                 data = base64.b64decode(body.get("fileBase64", ""))
-                tf = tempfile.NamedTemporaryFile(delete=False, suffix="_" + body.get("filename", "file.bin"))
-                tf.write(data); tf.close()
-                cmd = ["wacli","--store","/data/store","send","file","--to",to,"--file",tf.name,"--caption",body.get("caption",""),"--json"]
+                d = tempfile.mkdtemp()
+                path = os.path.join(d, os.path.basename(body.get("filename", "file.bin")))
+                open(path, "wb").write(data)
+                cmd = ["wacli","--store","/data/store","send","file","--to",to,"--file",path,"--caption",body.get("caption",""),"--json"]
             else:
                 return self._send(404, {"error": "not found"})
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
