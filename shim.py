@@ -27,12 +27,12 @@ class H(BaseHTTPRequestHandler):
             return self._send(400, {"error": "missing 'to'"})
         try:
             if self.path == "/send":
-                cmd = ["wacli", "send", "text", "--to", to, "--message", body.get("text", ""), "--json"]
+                cmd = ["wacli","--store","/data/store","send","text","--to",to,"--message",body.get("text",""),"--json"]
             elif self.path == "/send-file":
                 data = base64.b64decode(body.get("fileBase64", ""))
                 tf = tempfile.NamedTemporaryFile(delete=False, suffix="_" + body.get("filename", "file.bin"))
                 tf.write(data); tf.close()
-                cmd = ["wacli", "send", "file", "--to", to, "--file", tf.name, "--caption", body.get("caption", ""), "--json"]
+                cmd = ["wacli","--store","/data/store","send","file","--to",to,"--file",tf.name,"--caption",body.get("caption",""),"--json"]
             else:
                 return self._send(404, {"error": "not found"})
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
