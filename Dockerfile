@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
        | tar -xz -C /opt/wacli/bin wacli \
     && chmod +x /opt/wacli/bin/wacli \
     && ln -s /opt/wacli/bin/wacli /usr/local/bin/wacli
+ARG CACHE_BUST=2026081410
 COPY shim.py /app/shim.py
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
