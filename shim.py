@@ -19,13 +19,16 @@ class H(BaseHTTPRequestHandler):
         if self.path == "/health":
             return self._send(200, {"ok": True})
         if self.path == "/status":
-            # Non-sending socket probe: a usync contacts-check needs the live
-            # WhatsApp socket (same call that fails when disconnected), but
-            # sends no message. connected=True means sends will work.
+            # Contention-free connection probe: wacli's sync --follow writes an
+            # RFC3339 timestamp to {store}/HEARTBEAT on every sync event (incl.
+            # keepalives), throttled to 1/min. Fresh => connected; stale => the
+            # socket is down / in a reconnect loop. No socket call, no lock fight.
+            import datetime
             try:
-                r = subprocess.run(["wacli","--store","/data/store","contacts","check","+972526471797","--json"],
-                                   capture_output=True, text=True, timeout=25)
-                return self._send(200, {"ok": True, "connected": r.returncode == 0, "detail": (r.stderr or r.stdout)[:160]})
+                raw = open("/data/store/HEARTBEAT").read().strip()
+                hb = datetime.datetime.fromisoformat(raw.replace("Z", "+00:00"))
+                age = (datetime.datetime.now(datetime.timezone.utc) - hb).total_seconds()
+                return self._send(200, {"ok": True, "connected": age < 180, "heartbeat_age_s": round(age)})
             except Exception as e:
                 return self._send(200, {"ok": True, "connected": False, "detail": str(e)[:160]})
         return self._send(404, {"error": "not found"})
