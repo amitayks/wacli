@@ -24,5 +24,5 @@ if echo "$STATUS" | grep -qiE "not authenticated|no session|run .?wacli auth"; t
   fi
 else
   echo "[start] session found -> sync --follow"
-  exec wacli --store "$STORE" sync --follow --disable-history-sync
+  exec wacli --store "$STORE" sync --follow --max-db-size 512MB
 fi
