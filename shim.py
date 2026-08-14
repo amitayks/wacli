@@ -16,7 +16,19 @@ class H(BaseHTTPRequestHandler):
         self.send_response(code); self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
     def do_GET(self):
-        self._send(200, {"ok": True}) if self.path == "/health" else self._send(404, {"error": "not found"})
+        if self.path == "/health":
+            return self._send(200, {"ok": True})
+        if self.path == "/status":
+            # Non-sending socket probe: a usync contacts-check needs the live
+            # WhatsApp socket (same call that fails when disconnected), but
+            # sends no message. connected=True means sends will work.
+            try:
+                r = subprocess.run(["wacli","--store","/data/store","contacts","check","+972526471797","--json"],
+                                   capture_output=True, text=True, timeout=25)
+                return self._send(200, {"ok": True, "connected": r.returncode == 0, "detail": (r.stderr or r.stdout)[:160]})
+            except Exception as e:
+                return self._send(200, {"ok": True, "connected": False, "detail": str(e)[:160]})
+        return self._send(404, {"error": "not found"})
     def do_POST(self):
         if not self._ok():
             return self._send(401, {"error": "unauthorized"})
