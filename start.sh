@@ -1,24 +1,24 @@
 #!/bin/sh
-# Runs the send-shim alongside the wacli session keeper. On first boot with
-# WACLI_PAIR_PHONE set (and no existing session), requests a pairing code
-# (printed to logs); after the code is approved on the phone, `auth` proceeds
-# into sync. Later boots detect the saved session and run `sync --follow`.
+# Session keeper + send shim. Pairing is DELIBERATE (WACLI_PAIR=1) so the
+# container never loops pairing requests into WhatsApp's rate limiter.
 set -e
 mkdir -p /data/store /data/state /data/config /data/cache
 python3 /app/shim.py &
 
-# `auth status` exits 0 even when unpaired, so detect by its text.
 STATUS="$(wacli auth status 2>&1 || true)"
 echo "[start] auth status: $STATUS"
 if echo "$STATUS" | grep -qiE "not authenticated|no session|run .?wacli auth"; then
-  if [ -n "$WACLI_PAIR_PHONE" ]; then
-    echo "[start] pairing $WACLI_PAIR_PHONE -- APPROVE the code below in WhatsApp > Linked devices > Link with phone number"
-    exec wacli auth --phone "$WACLI_PAIR_PHONE"
+  if [ "$WACLI_PAIR" = "1" ] && [ -n "$WACLI_PAIR_PHONE" ]; then
+    echo "[start] PAIRING (one cycle) $WACLI_PAIR_PHONE -- approve the code in WhatsApp > Linked devices"
+    # On success, `auth` proceeds into sync and blocks (never returns).
+    wacli auth --phone "$WACLI_PAIR_PHONE" || echo "[start] pairing cycle ended without approval"
+    echo "[start] idling to avoid WhatsApp 429; set WACLI_PAIR=1 + redeploy to retry pairing"
+    exec tail -f /dev/null
   else
-    echo "[start] not paired and no WACLI_PAIR_PHONE; idling"
-    wait
+    echo "[start] not paired; idling (zero WhatsApp calls). Set WACLI_PAIR=1 + redeploy to pair."
+    exec tail -f /dev/null
   fi
 else
   echo "[start] session found -> sync --follow"
-  exec wacli sync --follow
+  exec wacli sync --follow --max-db-size 512MB
 fi
