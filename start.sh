@@ -13,7 +13,12 @@ python3 /app/shim.py &
 STATUS="$(wacli --store "$STORE" auth status 2>&1 || true)"
 echo "[start] auth status: $STATUS"
 if echo "$STATUS" | grep -qiE "not authenticated|no session|run .?wacli auth"; then
-  if [ "$WACLI_PAIR" = "1" ] && [ -n "$WACLI_PAIR_PHONE" ]; then
+  if [ "$WACLI_PAIR" = "1" ] && [ "$WACLI_PAIR_MODE" = "qr" ]; then
+    echo "[start] QR PAIRING (one cycle) -- scan in WhatsApp > Linked devices > Link a device"
+    wacli --store "$STORE" auth --qr-format text --events || echo "[start] qr pairing cycle ended"
+    echo "[start] idling to avoid WhatsApp 429; set WACLI_PAIR=1 + redeploy to retry"
+    exec tail -f /dev/null
+  elif [ "$WACLI_PAIR" = "1" ] && [ -n "$WACLI_PAIR_PHONE" ]; then
     echo "[start] PAIRING (one cycle) $WACLI_PAIR_PHONE -- approve the code in WhatsApp > Linked devices"
     wacli --store "$STORE" auth --phone "$WACLI_PAIR_PHONE" || echo "[start] pairing cycle ended without approval"
     echo "[start] idling to avoid WhatsApp 429; set WACLI_PAIR=1 + redeploy to retry"
