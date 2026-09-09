@@ -1,18 +1,1 @@
-# wacli WhatsApp bridge for Germanicus — prebuilt binary (Tom's proven pattern),
-# glibc base for the CGO/FTS5 release build, + token-gated send shim.
-FROM debian:stable-slim
-ARG WACLI_VERSION=0.11.1
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates ffmpeg tzdata python3 curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /opt/wacli/bin /data/store \
-    && curl -fsSL "https://github.com/openclaw/wacli/releases/download/v${WACLI_VERSION}/wacli_${WACLI_VERSION}_linux_amd64.tar.gz" \
-       | tar -xz -C /opt/wacli/bin wacli \
-    && chmod +x /opt/wacli/bin/wacli \
-    && ln -s /opt/wacli/bin/wacli /usr/local/bin/wacli
-ARG CACHE_BUST=2026081410
-COPY shim.py /app/shim.py
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-WORKDIR /data
-ENTRYPOINT ["/app/start.sh"]
+IyB3YWNsaSBXaGF0c0FwcCBicmlkZ2UgZm9yIEdlcm1hbmljdXMg4oCUIHByZWJ1aWx0IGJpbmFyeSAoVG9tJ3MgcHJvdmVuIHBhdHRlcm4pLAojIGdsaWJjIGJhc2UgZm9yIHRoZSBDR08vRlRTNSByZWxlYXNlIGJ1aWxkLCArIHRva2VuLWdhdGVkIHNlbmQgc2hpbS4KRlJPTSBkZWJpYW46c3RhYmxlLXNsaW0KQVJHIFdBQ0xJX1ZFUlNJT049MC4xOC4xClJVTiBhcHQtZ2V0IHVwZGF0ZSAmJiBhcHQtZ2V0IGluc3RhbGwgLXkgLS1uby1pbnN0YWxsLXJlY29tbWVuZHMgXAogICAgICBjYS1jZXJ0aWZpY2F0ZXMgZmZtcGVnIHR6ZGF0YSBweXRob24zIGN1cmwgXAogICAgJiYgcm0gLXJmIC92YXIvbGliL2FwdC9saXN0cy8qIFwKICAgICYmIG1rZGlyIC1wIC9vcHQvd2FjbGkvYmluIC9kYXRhL3N0b3JlIFwKICAgICYmIGN1cmwgLWZzU0wgImh0dHBzOi8vZ2l0aHViLmNvbS9vcGVuY2xhdy93YWNsaS9yZWxlYXNlcy9kb3dubG9hZC92JHtXQUNMSV9WRVJTSU9OfS93YWNsaV8ke1dBQ0xJX1ZFUlNJT059X2xpbnV4X2FtZDY0LnRhci5neiIgXAogICAgICAgfCB0YXIgLXh6IC1DIC9vcHQvd2FjbGkvYmluIHdhY2xpIFwKICAgICYmIGNobW9kICt4IC9vcHQvd2FjbGkvYmluL3dhY2xpIFwKICAgICYmIGxuIC1zIC9vcHQvd2FjbGkvYmluL3dhY2xpIC91c3IvbG9jYWwvYmluL3dhY2xpCkFSRyBDQUNIRV9CVVNUPTIwMjYwOTA5MDMKQ09QWSBzaGltLnB5IC9hcHAvc2hpbS5weQpDT1BZIHN0YXJ0LnNoIC9hcHAvc3RhcnQuc2gKUlVOIGNobW9kICt4IC9hcHAvc3RhcnQuc2gKV09SS0RJUiAvZGF0YQpFTlRSWVBPSU5UIFsiL2FwcC9zdGFydC5zaCJdCg==
