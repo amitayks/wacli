@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /opt/wacli/bin /data/store \
     && curl -fsSL "https://github.com/openclaw/wacli/releases/download/v${WACLI_VERSION}/wacli_${WACLI_VERSION}_linux_amd64.tar.gz" \
-       | tar -xz -C /opt/wacli/bin wacli \
+       | tar -xz -C /opt/wacli/bin ./wacli \
     && chmod +x /opt/wacli/bin/wacli \
     && ln -s /opt/wacli/bin/wacli /usr/local/bin/wacli
 ARG CACHE_BUST=2026091202
