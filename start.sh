@@ -1,1 +1,25 @@
-IyEvYmluL3NoCiMgUnVucyB0aGUgc2VuZC9yZWFkIHNoaW0gYWxvbmdzaWRlIHRoZSB3YWNsaSBzZXNzaW9uIGtlZXBlci4gRmlyc3QgYm9vdCB3aXRoCiMgV0FDTElfUEFJUl9QSE9ORSBzZXQgcmVxdWVzdHMgYSBwYWlyaW5nIGNvZGUgKHByaW50ZWQgdG8gbG9ncyk7IGFmdGVyIHRoZQojIGNvZGUgaXMgYXBwcm92ZWQgb24gdGhlIHBob25lLCBzdWJzZXF1ZW50IGJvb3RzIHJ1biBgc3luYyAtLWZvbGxvd2Agd2l0aCB0aGUKIyBsaXZlLW1lc3NhZ2Ugd2ViaG9vayBmZWVkaW5nIHRoZSBzaGltJ3MgdHJhY2tlZC1jb250YWN0IHJlYWQgbGFuZS4Kc2V0IC1lCm1rZGlyIC1wIC9kYXRhL3N0b3JlIC9kYXRhL3N0YXRlIC9kYXRhL2NvbmZpZyAvZGF0YS9jYWNoZQpweXRob24zIC9hcHAvc2hpbS5weSAmCmlmIHdhY2xpIGF1dGggc3RhdHVzID4vZGV2L251bGwgMj4mMTsgdGhlbgogIGVjaG8gIltzdGFydF0gcGFpcmVkIC0+IHN5bmMgLS1mb2xsb3cgKHdlYmhvb2sgLT4gc2hpbSAvaG9vaykiCiAgZXhlYyB3YWNsaSBzeW5jIC0tZm9sbG93IFwKICAgIC0tcHJlc2VuY2UtbW9kZSBxdWlldCBcCiAgICAtLXdlYmhvb2sgImh0dHA6Ly8xMjcuMC4wLjE6JHtQT1JUOi04MDgwfS9ob29rIiBcCiAgICAtLXdlYmhvb2stc2VjcmV0ICIke1dBQ0xJX1dFQkhPT0tfU0VDUkVUfSIgXAogICAgLS13ZWJob29rLWV2ZW50cyBtZXNzYWdlCmVsaWYgWyAtbiAiJFdBQ0xJX1BBSVJfUEhPTkUiIF07IHRoZW4KICBlY2hvICJbc3RhcnRdIE5PVCBwYWlyZWQgLT4gcmVxdWVzdGluZyBjb2RlIGZvciAkV0FDTElfUEFJUl9QSE9ORSIKICBlY2hvICJbc3RhcnRdIGFwcHJvdmUgaXQgaW4gV2hhdHNBcHAgPiBMaW5rZWQgZGV2aWNlcyA+IExpbmsgd2l0aCBwaG9uZSBudW1iZXIiCiAgd2FjbGkgYXV0aCAtLXBob25lICIkV0FDTElfUEFJUl9QSE9ORSIgLS1ldmVudHMgfHwgdHJ1ZQogIGVjaG8gIltzdGFydF0gYXV0aCBleGl0ZWQ7IHJlc3RhcnQgd2lsbCByZXN1bWUgaW4gc3luYyBtb2RlIGlmIHBhaXJpbmcgc3VjY2VlZGVkIgogIHNsZWVwIDUKZWxzZQogIGVjaG8gIltzdGFydF0gTk9UIHBhaXJlZCBhbmQgbm8gV0FDTElfUEFJUl9QSE9ORSBzZXQ7IGlkbGluZyAoc2V0IGl0ICsgcmVkZXBsb3kgdG8gcGFpcikiCiAgd2FpdApmaQo=
+#!/bin/sh
+# Runs the send/read shim alongside the wacli session keeper. First boot with
+# WACLI_PAIR_PHONE set requests a pairing code (printed to logs); after the
+# code is approved on the phone, subsequent boots run `sync --follow` with the
+# live-message webhook feeding the shim's tracked-contact read lane.
+set -e
+mkdir -p /data/store /data/state /data/config /data/cache
+python3 /app/shim.py &
+if wacli auth status >/dev/null 2>&1; then
+  echo "[start] paired -> sync --follow (webhook -> shim /hook)"
+  exec wacli sync --follow \
+    --presence-mode quiet \
+    --webhook "http://127.0.0.1:${PORT:-8080}/hook" \
+    --webhook-secret "${WACLI_WEBHOOK_SECRET}" \
+    --webhook-events message
+elif [ -n "$WACLI_PAIR_PHONE" ]; then
+  echo "[start] NOT paired -> requesting code for $WACLI_PAIR_PHONE"
+  echo "[start] approve it in WhatsApp > Linked devices > Link with phone number"
+  wacli auth --phone "$WACLI_PAIR_PHONE" --events || true
+  echo "[start] auth exited; restart will resume in sync mode if pairing succeeded"
+  sleep 5
+else
+  echo "[start] NOT paired and no WACLI_PAIR_PHONE set; idling (set it + redeploy to pair)"
+  wait
+fi
