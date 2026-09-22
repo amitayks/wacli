@@ -88,6 +88,12 @@ curl -X POST -H "Authorization: Bearer $TOK" -H "Content-Type: application/json"
    - Never build `@latest` on a session-carrying service; ARG WACLI_VERSION pins.
    - Bump ARG CACHE_BUST when only COPY'd files changed.
    - Re-pair only deliberately: WACLI_PAIR=1 + phone code (one cycle, then off).
+   - **Sensor sandbox (keisar): `node.fetch` BLANKS a URL held in a workspace
+     secret** (redactor) → "fetch() URL must not be a blank string". Bridge
+     calls from the capture sensor go through `node.process.exec` curl with
+     `$GERMANICUS_WACLI_URL` expanded in the child's own env. Also: no `_e`
+     secrets global exists in this sandbox; `node.process.env` works for
+     KEISAR_VEX_AMITAY only.
 
 ## Design source
 openspec change `personal-crm-whatsapp` (proposal/specs/design/tasks) in the
