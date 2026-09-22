@@ -190,7 +190,9 @@ class H(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            paired = subprocess.run(["wacli", "auth", "status"], capture_output=True).returncode == 0
+            st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
+            out = (st.stdout or "") + (st.stderr or "")
+            paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
             return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq})
         if self.path.startswith("/messages"):
             if not self._ok():
@@ -238,13 +240,13 @@ class H(BaseHTTPRequestHandler):
             return self._send(400, {"error": "missing 'to'"})
         try:
             if self.path == "/send":
-                cmd = ["wacli", "send", "text", "--to", to, "--message", body.get("text", ""), "--json"]
+                cmd = ["wacli", "--store", "/data/store", "send", "text", "--to", to, "--message", body.get("text", ""), "--json"]
             elif self.path == "/send-file":
                 data = base64.b64decode(body.get("fileBase64", ""))
                 tf = tempfile.NamedTemporaryFile(delete=False, suffix="_" + body.get("filename", "file.bin"))
                 tf.write(data)
                 tf.close()
-                cmd = ["wacli", "send", "file", "--to", to, "--file", tf.name, "--caption", body.get("caption", ""), "--json"]
+                cmd = ["wacli", "--store", "/data/store", "send", "file", "--to", to, "--file", tf.name, "--caption", body.get("caption", ""), "--json"]
             else:
                 return self._send(404, {"error": "not found"})
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)

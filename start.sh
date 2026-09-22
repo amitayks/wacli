@@ -1,25 +1,33 @@
 #!/bin/sh
-# Runs the send/read shim alongside the wacli session keeper. First boot with
-# WACLI_PAIR_PHONE set requests a pairing code (printed to logs); after the
-# code is approved on the phone, subsequent boots run `sync --follow` with the
-# live-message webhook feeding the shim's tracked-contact read lane.
+# Session keeper + send/read shim, Tom-pattern hardened. Pairing is deliberate
+# (WACLI_PAIR=1) so the container never loops pairing into WhatsApp's limiter.
+# sync --follow posts live messages to the shim's /hook (tracked-contact lane).
 set -e
-mkdir -p /data/store /data/state /data/config /data/cache
+STORE=/data/store
+mkdir -p "$STORE" /data/config
+# stale-LOCK cleanup (Tom's ExecStartPre): clear artifacts left by a hard kill
+if [ -f "$STORE/LOCK" ]; then
+  kill -0 "$(cat "$STORE/LOCK" 2>/dev/null)" 2>/dev/null || rm -f "$STORE/LOCK" "$STORE/HEARTBEAT" "$STORE/.send.sock"
+fi
 python3 /app/shim.py &
-if wacli auth status >/dev/null 2>&1; then
-  echo "[start] paired -> sync --follow (webhook -> shim /hook)"
-  exec wacli sync --follow \
+
+STATUS="$(wacli --store "$STORE" auth status 2>&1 || true)"
+echo "[start] auth status: $STATUS"
+if echo "$STATUS" | grep -qiE "not authenticated|no session|run .?wacli auth"; then
+  if [ "$WACLI_PAIR" = "1" ] && [ -n "$WACLI_PAIR_PHONE" ]; then
+    echo "[start] PAIRING (one cycle) $WACLI_PAIR_PHONE -- approve the code in WhatsApp > Linked devices"
+    wacli --store "$STORE" auth --phone "$WACLI_PAIR_PHONE" || echo "[start] pairing cycle ended without approval"
+    echo "[start] idling to avoid WhatsApp 429; set WACLI_PAIR=1 + redeploy to retry"
+    exec tail -f /dev/null
+  else
+    echo "[start] not paired; idling (zero WhatsApp calls). Set WACLI_PAIR=1 + redeploy to pair."
+    exec tail -f /dev/null
+  fi
+else
+  echo "[start] session found -> sync --follow (webhook -> shim /hook)"
+  exec wacli --store "$STORE" sync --follow --max-db-size 512MB \
     --presence-mode quiet \
     --webhook "http://127.0.0.1:${PORT:-8080}/hook" \
     --webhook-secret "${WACLI_WEBHOOK_SECRET}" \
     --webhook-events message
-elif [ -n "$WACLI_PAIR_PHONE" ]; then
-  echo "[start] NOT paired -> requesting code for $WACLI_PAIR_PHONE"
-  echo "[start] approve it in WhatsApp > Linked devices > Link with phone number"
-  wacli auth --phone "$WACLI_PAIR_PHONE" --events || true
-  echo "[start] auth exited; restart will resume in sync mode if pairing succeeded"
-  sleep 5
-else
-  echo "[start] NOT paired and no WACLI_PAIR_PHONE set; idling (set it + redeploy to pair)"
-  wait
 fi
