@@ -51,8 +51,64 @@ def _bare(jid):
 ALLOW = _load_allowlist()
 
 
+SESSION_DB = os.environ.get("WACLI_SESSION_DB", "/data/store/session.db")
+_lid_cache = {}                   # lid user -> (pn user | "", expiresAt)
+# privacy-safe drop counters: COUNTS ONLY, never identifiers or content
+STATS = {"hook_msgs": 0, "tracked": 0, "drop_pn": 0, "drop_lid": 0,
+         "drop_lid_unresolved": 0, "drop_group": 0, "drop_other": 0,
+         "lid_resolved": 0, "last_tracked_at": None, "since": int(time.time())}
+
+
+def _lid_lookup(lid_user):
+    """WhatsApp hidden ID (LID) -> phone-number user, via whatsmeow's own
+    lid map in session.db (read-only). Cached 5 min; '' when unknown."""
+    now = time.time()
+    hit = _lid_cache.get(lid_user)
+    if hit and hit[1] > now:
+        return hit[0]
+    pn = ""
+    try:
+        con = sqlite3.connect(f"file:{SESSION_DB}?mode=ro", uri=True, timeout=2)
+        try:
+            row = con.execute("SELECT pn FROM whatsmeow_lid_map WHERE lid=?", (lid_user,)).fetchone()
+            pn = (row[0] if row else "") or ""
+        finally:
+            con.close()
+    except Exception:
+        pn = ""
+    _lid_cache[lid_user] = (pn, now + 300)
+    return pn
+
+
+def _canonical(chat_jid):
+    """Return the phone-number JID for a @lid chat when the map knows it."""
+    if chat_jid and chat_jid.endswith("@lid"):
+        pn = _lid_lookup(_bare(chat_jid))
+        if pn:
+            return pn + "@s.whatsapp.net"
+    return chat_jid
+
+
 def _allowed(chat_jid):
-    return chat_jid in ALLOW or _bare(chat_jid) in {_bare(j) for j in ALLOW}
+    if not chat_jid:
+        return False
+    bares = {_bare(j) for j in ALLOW}
+    if chat_jid in ALLOW or _bare(chat_jid) in bares:
+        return True
+    c = _canonical(chat_jid)
+    return c != chat_jid and _bare(c) in bares
+
+
+def _count_drop(chat_jid):
+    j = chat_jid or ""
+    if j.endswith("@g.us"):
+        STATS["drop_group"] += 1
+    elif j.endswith("@lid"):
+        STATS["drop_lid" if _canonical(j) != j else "drop_lid_unresolved"] += 1
+    elif j.endswith("@s.whatsapp.net"):
+        STATS["drop_pn"] += 1
+    else:
+        STATS["drop_other"] += 1
 
 
 def _init_seq():
@@ -74,7 +130,8 @@ def _append_tracked(evt):
         _seq += 1
         row = {
             "seq": _seq,
-            "chat": evt.get("Chat"),
+            "chat": _canonical(evt.get("Chat")),
+            "rawChat": evt.get("Chat"),
             "id": evt.get("ID"),
             "sender": evt.get("SenderJID"),
             "ts": evt.get("Timestamp"),
@@ -193,7 +250,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.1-lid"})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -218,8 +275,16 @@ class H(BaseHTTPRequestHandler):
                 return self._send(400, {"error": "bad json"})
             if evt.get("EventType"):          # receipts/presence: not stored
                 return self._send(200, {"ok": True})
-            if _allowed(evt.get("Chat", "")):
+            chat = evt.get("Chat", "")
+            STATS["hook_msgs"] += 1
+            if _allowed(chat):
+                if chat.endswith("@lid"):
+                    STATS["lid_resolved"] += 1
                 _append_tracked(evt)
+                STATS["tracked"] += 1
+                STATS["last_tracked_at"] = int(time.time())
+            else:
+                _count_drop(chat)
             # no match → falls through unwritten, by law
             return self._send(200, {"ok": True})
 
