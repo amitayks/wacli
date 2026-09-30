@@ -70,6 +70,26 @@ curl -X POST -H "Authorization: Bearer $TOK" -H "Content-Type: application/json"
 # sensor: sensors.run {id:"5z9o0avmbsko", dryRun:true} via /mutate
 ```
 
+## Root cause of the 8-day zero-capture (2026-09-30, paid-in-blood)
+Capture had produced ZERO rows since the 2026-09-22 rewrite. Root cause was
+NOT the allowlist or hidden IDs — it was `start.sh` calling `wacli sync --follow`
+with a `--webhook http://127.0.0.1:8080/hook` but WITHOUT `--webhook-allow-private`.
+wacli's default webhook HTTP client (`syncWebhookSafeHTTPClient`) refuses any URL
+resolving to localhost/private ranges, so EVERY webhook POST failed
+("post webhook http://127.0.0.1:8080: Post failed" in sync logs) and nothing was
+ever handed to the shim. Fix: add `--webhook-allow-private` to the sync flags.
+Two silent-failure lessons baked in the same fix:
+- `/health` now carries `stats` (hook_msgs / tracked / drop_* / lid_resolved /
+  last_tracked_at) — counts only, never identifiers or content — so a dead pipe
+  is visible without reading content. Watch: sensor `3fkmb8m4yr8s`
+  (wacli-capture-health) wakes Germanicus on unreachable / unpaired / 48h-silent.
+- shim v2.1 also resolves `@lid` chat JIDs to phone numbers via whatsmeow's
+  `whatsmeow_lid_map` in session.db (read-only) — belt-and-braces in case a
+  tracked chat ever arrives under a hidden ID. Our chats arrived as plain PN,
+  so this was not the cause, but it removes a whole future failure class.
+CHECKLIST for any wacli sync webhook to a co-located shim: localhost target ⇒
+`--webhook-allow-private` is MANDATORY, or every POST silently fails.
+
 ## Deploy / rollback runbook (paid-in-blood, 2026-09-22)
 1. Commit to `amitayks/wacli` main (git push with classic PAT; NEVER the
    GitHub contents API from the plugin — it double-base64s files).
