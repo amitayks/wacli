@@ -29,5 +29,6 @@ else
     --presence-mode quiet \
     --webhook "http://127.0.0.1:${PORT:-8080}/hook" \
     --webhook-secret "${WACLI_WEBHOOK_SECRET}" \
-    --webhook-events message
+    --webhook-events message \
+    --webhook-allow-private
 fi
