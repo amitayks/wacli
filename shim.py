@@ -1,1 +1,351 @@
-IyEvdXNyL2Jpbi9lbnYgcHl0aG9uMwoiIiJ3YWNsaSBicmlkZ2Ugc2hpbSB2MiDigJQgc2VuZCArIHRyYWNrZWQtY29udGFjdCByZWFkIGxhbmVzLgoKTGFuZXM6CiAgU0VORCAodW5jaGFuZ2VkIGNvbnRyYWN0KTogUE9TVCAvc2VuZCB7dG8sdGV4dH0gfCAvc2VuZC1maWxlIHt0byxmaWxlQmFzZTY0LAogICAgZmlsZW5hbWUsY2FwdGlvbn0g4oCUIGJlYXJlci1nYXRlZCwgZXhlY3MgYHdhY2xpIHNlbmRgIChkZWxlZ2F0ZWQgdG8gdGhlCiAgICBydW5uaW5nIHN5bmMgLS1mb2xsb3cgdmlhIGl0cyBzb2NrZXQpLgogIFJFQUQgKG5ldyk6IHdhY2xpIHN5bmMgcG9zdHMgZXZlcnkgbGl2ZSBtZXNzYWdlIHRvIC9ob29rIChsb2NhbGhvc3Qgb25seSwKICAgIEhNQUMtc2lnbmVkKS4gVGhlIGFsbG93bGlzdCBmaWx0ZXIgcnVucyBCRUZPUkUgYW55IHdyaXRlOiBtZXNzYWdlcyB3aG9zZQogICAgY2hhdCBKSUQgaXMgb24gdGhlIGFsbG93bGlzdCBhcHBlbmQgdG8gdGhlIHRyYWNrZWQgc3RvcmUKICAgICgvZGF0YS9jb25maWcvdHJhY2tlZC5qc29ubCk7IGV2ZXJ5dGhpbmcgZWxzZSBpcyBkaXNjYXJkZWQgaW4gbWVtb3J5LgogICAgR0VUIC9tZXNzYWdlcz9zaW5jZT08c2VxPiBzZXJ2ZXMgdHJhY2tlZCByb3dzLiBQT1NUIC9hbGxvd2xpc3QgcmVwbGFjZXMKICAgIHRoZSBhbGxvd2xpc3QgYXRvbWljYWxseSAoYW5kIHBydW5lcyB0cmFja2VkIHJvd3MgdGhhdCBmZWxsIG9mZiBpdCkuCiAgUFJJVkFDWSBQVVJHRTogYSBiYWNrZ3JvdW5kIHRocmVhZCBkZWxldGVzIG5vbi1hbGxvd2xpc3RlZCBjaGF0L21lc3NhZ2Ugcm93cwogICAgZnJvbSB3YWNsaSdzIG93biBzdG9yZSAod2FjbGkuZGIsIFdBTCkgc28gbm90aGluZyBvdXRzaWRlIHRoZSB0cmFja2VkCiAgICBsaXN0IHBlcnNpc3RzIG9uIHRoaXMgdm9sdW1lLiBGYWlsLWNsb3NlZDogcHVyZ2UgZXJyb3JzIGFyZSBsb2dnZWQKICAgIChjb250ZW50LWZyZWUpIGFuZCByZXRyaWVkIG5leHQgY3ljbGU7IHRoZXkgbmV2ZXIgY3Jhc2ggdGhlIHNoaW0uCgpMb2dzIE5FVkVSIGNvbnRhaW4gbWVzc2FnZSBjb250ZW50IG9yIG5vbi10cmFja2VkIGlkZW50aWZpZXJzIOKAlCBjb3VudHMgYW5kCnRyYWNrZWQgSklEcyBvbmx5LgoiIiIKaW1wb3J0IG9zLCBqc29uLCBiYXNlNjQsIHRlbXBmaWxlLCBzdWJwcm9jZXNzLCB0aHJlYWRpbmcsIHRpbWUsIHNxbGl0ZTMsIGhtYWMsIGhhc2hsaWIKZnJvbSBodHRwLnNlcnZlciBpbXBvcnQgQmFzZUhUVFBSZXF1ZXN0SGFuZGxlciwgVGhyZWFkaW5nSFRUUFNlcnZlcgoKVE9LRU4gPSBvcy5lbnZpcm9uLmdldCgiR0VSTUFOSUNVU19XQUNMSV9TRU5EX1RPS0VOIiwgIiIpCkhPT0tfU0VDUkVUID0gb3MuZW52aXJvbi5nZXQoIldBQ0xJX1dFQkhPT0tfU0VDUkVUIiwgIiIpClBPUlQgPSBpbnQob3MuZW52aXJvbi5nZXQoIlBPUlQiLCAiODA4MCIpKQpDT05GX0RJUiA9IG9zLmVudmlyb24uZ2V0KCJTSElNX0NPTkZfRElSIiwgIi9kYXRhL2NvbmZpZyIpCkFMTE9XTElTVF9QQVRIID0gb3MucGF0aC5qb2luKENPTkZfRElSLCAiYWxsb3dsaXN0Lmpzb24iKQpUUkFDS0VEX1BBVEggPSBvcy5wYXRoLmpvaW4oQ09ORl9ESVIsICJ0cmFja2VkLmpzb25sIikKV0FDTElfREIgPSBvcy5lbnZpcm9uLmdldCgiV0FDTElfREIiLCAiL2RhdGEvc3RvcmUvd2FjbGkuZGIiKQpQVVJHRV9JTlRFUlZBTCA9IGludChvcy5lbnZpcm9uLmdldCgiUFVSR0VfSU5URVJWQUxfU0VDIiwgIjYwMCIpKQoKX2xvY2sgPSB0aHJlYWRpbmcuTG9jaygpICAgICAgICAgICMgZ3VhcmRzIGFsbG93bGlzdCArIHRyYWNrZWQgc3RvcmUKX3NlcSA9IDAgICAgICAgICAgICAgICAgICAgICAgICAgICMgbW9ub3RvbmljYWxseSBpbmNyZWFzaW5nIHJvdyBpZAoKCmRlZiBfbG9hZF9hbGxvd2xpc3QoKToKICAgIHRyeToKICAgICAgICB3aXRoIG9wZW4oQUxMT1dMSVNUX1BBVEgpIGFzIGY6CiAgICAgICAgICAgIHJldHVybiBzZXQoanNvbi5sb2FkKGYpLmdldCgiamlkcyIsIFtdKSkKICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgcmV0dXJuIHNldCgpCgoKZGVmIF9iYXJlKGppZCk6CiAgICAiIiIxNTU1MTIzNDU2N0BzLndoYXRzYXBwLm5ldCAtPiAxNTU1MTIzNDU2NyAobWF0Y2ggb24gYmFyZSBudW1iZXIgdG9vKS4iIiIKICAgIHJldHVybiBqaWQuc3BsaXQoIkAiLCAxKVswXS5zcGxpdCgiOiIsIDEpWzBdIGlmIGppZCBlbHNlICIiCgoKQUxMT1cgPSBfbG9hZF9hbGxvd2xpc3QoKQoKClNFU1NJT05fREIgPSBvcy5lbnZpcm9uLmdldCgiV0FDTElfU0VTU0lPTl9EQiIsICIvZGF0YS9zdG9yZS9zZXNzaW9uLmRiIikKX2xpZF9jYWNoZSA9IHt9ICAgICAgICAgICAgICAgICAgICMgbGlkIHVzZXIgLT4gKHBuIHVzZXIgfCAiIiwgZXhwaXJlc0F0KQojIHByaXZhY3ktc2FmZSBkcm9wIGNvdW50ZXJzOiBDT1VOVFMgT05MWSwgbmV2ZXIgaWRlbnRpZmllcnMgb3IgY29udGVudApTVEFUUyA9IHsiaG9va19tc2dzIjogMCwgInRyYWNrZWQiOiAwLCAiZHJvcF9wbiI6IDAsICJkcm9wX2xpZCI6IDAsCiAgICAgICAgICJkcm9wX2xpZF91bnJlc29sdmVkIjogMCwgImRyb3BfZ3JvdXAiOiAwLCAiZHJvcF9vdGhlciI6IDAsCiAgICAgICAgICJsaWRfcmVzb2x2ZWQiOiAwLCAibGFzdF90cmFja2VkX2F0IjogTm9uZSwgInNpbmNlIjogaW50KHRpbWUudGltZSgpKX0KCgpkZWYgX2xpZF9sb29rdXAobGlkX3VzZXIpOgogICAgIiIiV2hhdHNBcHAgaGlkZGVuIElEIChMSUQpIC0+IHBob25lLW51bWJlciB1c2VyLCB2aWEgd2hhdHNtZW93J3Mgb3duCiAgICBsaWQgbWFwIGluIHNlc3Npb24uZGIgKHJlYWQtb25seSkuIENhY2hlZCA1IG1pbjsgJycgd2hlbiB1bmtub3duLiIiIgogICAgbm93ID0gdGltZS50aW1lKCkKICAgIGhpdCA9IF9saWRfY2FjaGUuZ2V0KGxpZF91c2VyKQogICAgaWYgaGl0IGFuZCBoaXRbMV0gPiBub3c6CiAgICAgICAgcmV0dXJuIGhpdFswXQogICAgcG4gPSAiIgogICAgdHJ5OgogICAgICAgIGNvbiA9IHNxbGl0ZTMuY29ubmVjdChmImZpbGU6e1NFU1NJT05fREJ9P21vZGU9cm8iLCB1cmk9VHJ1ZSwgdGltZW91dD0yKQogICAgICAgIHRyeToKICAgICAgICAgICAgcm93ID0gY29uLmV4ZWN1dGUoIlNFTEVDVCBwbiBGUk9NIHdoYXRzbWVvd19saWRfbWFwIFdIRVJFIGxpZD0/IiwgKGxpZF91c2VyLCkpLmZldGNob25lKCkKICAgICAgICAgICAgcG4gPSAocm93WzBdIGlmIHJvdyBlbHNlICIiKSBvciAiIgogICAgICAgIGZpbmFsbHk6CiAgICAgICAgICAgIGNvbi5jbG9zZSgpCiAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgIHBuID0gIiIKICAgIF9saWRfY2FjaGVbbGlkX3VzZXJdID0gKHBuLCBub3cgKyAzMDApCiAgICByZXR1cm4gcG4KCgpkZWYgX2Nhbm9uaWNhbChjaGF0X2ppZCk6CiAgICAiIiJSZXR1cm4gdGhlIHBob25lLW51bWJlciBKSUQgZm9yIGEgQGxpZCBjaGF0IHdoZW4gdGhlIG1hcCBrbm93cyBpdC4iIiIKICAgIGlmIGNoYXRfamlkIGFuZCBjaGF0X2ppZC5lbmRzd2l0aCgiQGxpZCIpOgogICAgICAgIHBuID0gX2xpZF9sb29rdXAoX2JhcmUoY2hhdF9qaWQpKQogICAgICAgIGlmIHBuOgogICAgICAgICAgICByZXR1cm4gcG4gKyAiQHMud2hhdHNhcHAubmV0IgogICAgcmV0dXJuIGNoYXRfamlkCgoKZGVmIF9hbGxvd2VkKGNoYXRfamlkKToKICAgIGlmIG5vdCBjaGF0X2ppZDoKICAgICAgICByZXR1cm4gRmFsc2UKICAgIGJhcmVzID0ge19iYXJlKGopIGZvciBqIGluIEFMTE9XfQogICAgaWYgY2hhdF9qaWQgaW4gQUxMT1cgb3IgX2JhcmUoY2hhdF9qaWQpIGluIGJhcmVzOgogICAgICAgIHJldHVybiBUcnVlCiAgICBjID0gX2Nhbm9uaWNhbChjaGF0X2ppZCkKICAgIHJldHVybiBjICE9IGNoYXRfamlkIGFuZCBfYmFyZShjKSBpbiBiYXJlcwoKCmRlZiBfY291bnRfZHJvcChjaGF0X2ppZCk6CiAgICBqID0gY2hhdF9qaWQgb3IgIiIKICAgIGlmIGouZW5kc3dpdGgoIkBnLnVzIik6CiAgICAgICAgU1RBVFNbImRyb3BfZ3JvdXAiXSArPSAxCiAgICBlbGlmIGouZW5kc3dpdGgoIkBsaWQiKToKICAgICAgICBTVEFUU1siZHJvcF9saWQiIGlmIF9jYW5vbmljYWwoaikgIT0gaiBlbHNlICJkcm9wX2xpZF91bnJlc29sdmVkIl0gKz0gMQogICAgZWxpZiBqLmVuZHN3aXRoKCJAcy53aGF0c2FwcC5uZXQiKToKICAgICAgICBTVEFUU1siZHJvcF9wbiJdICs9IDEKICAgIGVsc2U6CiAgICAgICAgU1RBVFNbImRyb3Bfb3RoZXIiXSArPSAxCgoKZGVmIF9pbml0X3NlcSgpOgogICAgZ2xvYmFsIF9zZXEKICAgIHRyeToKICAgICAgICB3aXRoIG9wZW4oVFJBQ0tFRF9QQVRIKSBhcyBmOgogICAgICAgICAgICBmb3IgbGluZSBpbiBmOgogICAgICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgICAgIF9zZXEgPSBtYXgoX3NlcSwganNvbi5sb2FkcyhsaW5lKS5nZXQoInNlcSIsIDApKQogICAgICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICAgICAgICBwYXNzCiAgICBleGNlcHQgRmlsZU5vdEZvdW5kRXJyb3I6CiAgICAgICAgcGFzcwoKCmRlZiBfYXBwZW5kX3RyYWNrZWQoZXZ0KToKICAgIGdsb2JhbCBfc2VxCiAgICB3aXRoIF9sb2NrOgogICAgICAgIF9zZXEgKz0gMQogICAgICAgIHJvdyA9IHsKICAgICAgICAgICAgInNlcSI6IF9zZXEsCiAgICAgICAgICAgICJjaGF0IjogX2Nhbm9uaWNhbChldnQuZ2V0KCJDaGF0IikpLAogICAgICAgICAgICAicmF3Q2hhdCI6IGV2dC5nZXQoIkNoYXQiKSwKICAgICAgICAgICAgImlkIjogZXZ0LmdldCgiSUQiKSwKICAgICAgICAgICAgInNlbmRlciI6IGV2dC5nZXQoIlNlbmRlckpJRCIpLAogICAgICAgICAgICAidHMiOiBldnQuZ2V0KCJUaW1lc3RhbXAiKSwKICAgICAgICAgICAgImZyb21NZSI6IGJvb2woZXZ0LmdldCgiRnJvbU1lIikpLAogICAgICAgICAgICAidGV4dCI6IGV2dC5nZXQoIlRleHQiLCAiIiksCiAgICAgICAgICAgICJjaGF0TmFtZSI6IGV2dC5nZXQoIkNoYXROYW1lIiwgIiIpLAogICAgICAgICAgICAibWVkaWEiOiAoZXZ0LmdldCgiTWVkaWEiKSBvciB7fSkuZ2V0KCJUeXBlIikgaWYgZXZ0LmdldCgiTWVkaWEiKSBlbHNlIE5vbmUsCiAgICAgICAgfQogICAgICAgICMgdjIuMjoga2VlcCBFVkVSWVRISU5HIHRoZSBwYXJzZWQgbWVzc2FnZSBjYXJyaWVzLCBub3QganVzdCBUZXh0LgogICAgICAgICMgUmVhY3Rpb25zLCByZXBsaWVzLCBlZGl0cywgZGVsZXRlcywgY2FwdGlvbnMsIGxvY2F0aW9ucywgcG9sbHMgd2VyZQogICAgICAgICMgc2lsZW50bHkgZHJvcHBlZCBiZWZvcmUgKGVtcHR5IHJvd3MgZnJvbSB0aGUgY29udGFjdCwgMjAyNi0xMC0wMSkuCiAgICAgICAgbSA9IGV2dC5nZXQoIk1lZGlhIikgb3Ige30KICAgICAgICBleHRyYSA9IHsKICAgICAgICAgICAgImNhcHRpb24iOiBtLmdldCgiQ2FwdGlvbiIpIG9yIE5vbmUsCiAgICAgICAgICAgICJmaWxlbmFtZSI6IG0uZ2V0KCJGaWxlbmFtZSIpIG9yIE5vbmUsCiAgICAgICAgICAgICJtaW1lIjogbS5nZXQoIk1pbWVUeXBlIikgb3IgTm9uZSwKICAgICAgICAgICAgInJlcGx5VG9JZCI6IGV2dC5nZXQoIlJlcGx5VG9JRCIpIG9yIE5vbmUsCiAgICAgICAgICAgICJyZXBseVRvU2VuZGVyIjogZXZ0LmdldCgiUmVwbHlUb1NlbmRlckpJRCIpIG9yIE5vbmUsCiAgICAgICAgICAgICJyZXBseVRvVGV4dCI6IGV2dC5nZXQoIlJlcGx5VG9EaXNwbGF5Iikgb3IgTm9uZSwKICAgICAgICAgICAgInJlYWN0aW9uIjogZXZ0LmdldCgiUmVhY3Rpb25FbW9qaSIpIG9yIE5vbmUsCiAgICAgICAgICAgICJyZWFjdGlvblRvSWQiOiBldnQuZ2V0KCJSZWFjdGlvblRvSUQiKSBvciBOb25lLAogICAgICAgICAgICAiZWRpdGVkIjogYm9vbChldnQuZ2V0KCJFZGl0ZWQiKSkgb3IgTm9uZSwKICAgICAgICAgICAgInJldm9rZWQiOiBib29sKGV2dC5nZXQoIlJldm9rZWQiKSkgb3IgTm9uZSwKICAgICAgICAgICAgImZvcndhcmRlZCI6IGJvb2woZXZ0LmdldCgiSXNGb3J3YXJkZWQiKSkgb3IgTm9uZSwKICAgICAgICAgICAgImxvY2F0aW9uIjogZXZ0LmdldCgiTG9jYXRpb24iKSBvciBOb25lLAogICAgICAgICAgICAicG9sbCI6IGV2dC5nZXQoIlBvbGwiKSBvciBOb25lLAogICAgICAgICAgICAicG9sbFZvdGUiOiBldnQuZ2V0KCJQb2xsVm90ZSIpIG9yIE5vbmUsCiAgICAgICAgICAgICJwdXNoTmFtZSI6IGV2dC5nZXQoIlB1c2hOYW1lIikgb3IgTm9uZSwKICAgICAgICAgICAgInVuaGFuZGxlZCI6IGV2dC5nZXQoIlVuaGFuZGxlZFBheWxvYWQiKSBvciBOb25lLAogICAgICAgIH0KICAgICAgICByb3cudXBkYXRlKHtrOiB2IGZvciBrLCB2IGluIGV4dHJhLml0ZW1zKCkgaWYgdiBpcyBub3QgTm9uZX0pCiAgICAgICAgd2l0aCBvcGVuKFRSQUNLRURfUEFUSCwgImEiKSBhcyBmOgogICAgICAgICAgICBmLndyaXRlKGpzb24uZHVtcHMocm93LCBlbnN1cmVfYXNjaWk9RmFsc2UpICsgIlxuIikKICAgIHJldHVybiByb3cKCgpkZWYgX3JlYWRfdHJhY2tlZChzaW5jZSk6CiAgICByb3dzID0gW10KICAgIHRyeToKICAgICAgICB3aXRoIF9sb2NrOgogICAgICAgICAgICB3aXRoIG9wZW4oVFJBQ0tFRF9QQVRIKSBhcyBmOgogICAgICAgICAgICAgICAgZm9yIGxpbmUgaW4gZjoKICAgICAgICAgICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICAgICAgICAgIHIgPSBqc29uLmxvYWRzKGxpbmUpCiAgICAgICAgICAgICAgICAgICAgICAgIGlmIHIuZ2V0KCJzZXEiLCAwKSA+IHNpbmNlOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgcm93cy5hcHBlbmQocikKICAgICAgICAgICAgICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICAgICAgICAgICAgICBwYXNzCiAgICBleGNlcHQgRmlsZU5vdEZvdW5kRXJyb3I6CiAgICAgICAgcGFzcwogICAgcmV0dXJuIHJvd3MKCgpkZWYgX3NldF9hbGxvd2xpc3Qoamlkcyk6CiAgICBnbG9iYWwgQUxMT1cKICAgIHdpdGggX2xvY2s6CiAgICAgICAgdG1wID0gQUxMT1dMSVNUX1BBVEggKyAiLnRtcCIKICAgICAgICB3aXRoIG9wZW4odG1wLCAidyIpIGFzIGY6CiAgICAgICAgICAgIGpzb24uZHVtcCh7ImppZHMiOiBzb3J0ZWQoc2V0KGppZHMpKX0sIGYpCiAgICAgICAgb3MucmVwbGFjZSh0bXAsIEFMTE9XTElTVF9QQVRIKQogICAgICAgIEFMTE9XID0gc2V0KGppZHMpCiAgICAgICAgIyBwcnVuZSB0cmFja2VkIHJvd3MgdGhhdCBmZWxsIG9mZiB0aGUgbGlzdAogICAgICAgIGtlcHQsIGRyb3BwZWQgPSBbXSwgMAogICAgICAgIHRyeToKICAgICAgICAgICAgd2l0aCBvcGVuKFRSQUNLRURfUEFUSCkgYXMgZjoKICAgICAgICAgICAgICAgIGZvciBsaW5lIGluIGY6CiAgICAgICAgICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgICAgICAgICByID0ganNvbi5sb2FkcyhsaW5lKQogICAgICAgICAgICAgICAgICAgICAgICBpZiBfYWxsb3dlZChyLmdldCgiY2hhdCIsICIiKSk6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBrZXB0LmFwcGVuZChsaW5lKQogICAgICAgICAgICAgICAgICAgICAgICBlbHNlOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgZHJvcHBlZCArPSAxCiAgICAgICAgICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICAgICAgICAgICAgZHJvcHBlZCArPSAxCiAgICAgICAgICAgIHdpdGggb3BlbihUUkFDS0VEX1BBVEggKyAiLnRtcCIsICJ3IikgYXMgZjoKICAgICAgICAgICAgICAgIGYud3JpdGVsaW5lcyhrZXB0KQogICAgICAgICAgICBvcy5yZXBsYWNlKFRSQUNLRURfUEFUSCArICIudG1wIiwgVFJBQ0tFRF9QQVRIKQogICAgICAgIGV4Y2VwdCBGaWxlTm90Rm91bmRFcnJvcjoKICAgICAgICAgICAgcGFzcwogICAgcHJpbnQoZiJbc2hpbV0gYWxsb3dsaXN0IHNldDoge2xlbihBTExPVyl9IGppZHMsIHBydW5lZCB7ZHJvcHBlZH0gcm93cyIsIGZsdXNoPVRydWUpCgoKZGVmIF9wdXJnZV93YWNsaV9zdG9yZSgpOgogICAgIiIiRGVsZXRlIG5vbi1hbGxvd2xpc3RlZCBjaGF0IGNvbnRlbnQgZnJvbSB3YWNsaSdzIG93biBkYi4gTG9jYWwgb25seS4iIiIKICAgIGlmIG5vdCBvcy5wYXRoLmV4aXN0cyhXQUNMSV9EQik6CiAgICAgICAgcmV0dXJuCiAgICB0cnk6CiAgICAgICAgY29uID0gc3FsaXRlMy5jb25uZWN0KFdBQ0xJX0RCLCB0aW1lb3V0PTEwKQogICAgICAgIGNvbi5leGVjdXRlKCJQUkFHTUEgYnVzeV90aW1lb3V0PTEwMDAwIikKICAgICAgICBjdXIgPSBjb24uZXhlY3V0ZSgiU0VMRUNUIERJU1RJTkNUIGNoYXRfamlkIEZST00gbWVzc2FnZXMiKQogICAgICAgIHRhcmdldHMgPSBbclswXSBmb3IgciBpbiBjdXIuZmV0Y2hhbGwoKSBpZiByWzBdIGFuZCBub3QgX2FsbG93ZWQoclswXSldCiAgICAgICAgdG90YWwgPSAwCiAgICAgICAgZm9yIGppZCBpbiB0YXJnZXRzOgogICAgICAgICAgICBjID0gY29uLmV4ZWN1dGUoIkRFTEVURSBGUk9NIG1lc3NhZ2VzIFdIRVJFIGNoYXRfamlkPT8iLCAoamlkLCkpCiAgICAgICAgICAgIHRvdGFsICs9IGMucm93Y291bnQKICAgICAgICAgICAgY29uLmNvbW1pdCgpCiAgICAgICAgIyBGVFMgKyBjaGF0cyByb3dzIGJlc3QtZWZmb3J0OyBzY2hlbWEtZGVwZW5kZW50LCBmYWlsIHNpbGVudGx5IHBlciB0YWJsZQogICAgICAgIGZvciBzdG10LCBhcmdzIGluIFsKICAgICAgICAgICAgKCJERUxFVEUgRlJPTSBjaGF0cyBXSEVSRSBqaWQgTk9UIElOIChTRUxFQ1QgRElTVElOQ1QgY2hhdF9qaWQgRlJPTSBtZXNzYWdlcykiLCAoKSksCiAgICAgICAgXToKICAgICAgICAgICAgdHJ5OgogICAgICAgICAgICAgICAgY29uLmV4ZWN1dGUoc3RtdCwgYXJncyk7IGNvbi5jb21taXQoKQogICAgICAgICAgICBleGNlcHQgc3FsaXRlMy5FcnJvcjoKICAgICAgICAgICAgICAgIHBhc3MKICAgICAgICBjb24uY2xvc2UoKQogICAgICAgIGlmIHRvdGFsOgogICAgICAgICAgICBwcmludChmIltzaGltXSBwdXJnZTogcmVtb3ZlZCB7dG90YWx9IG5vbi10cmFja2VkIG1lc3NhZ2Ugcm93cyAoe2xlbih0YXJnZXRzKX0gY2hhdHMpIiwgZmx1c2g9VHJ1ZSkKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICBwcmludChmIltzaGltXSBwdXJnZSBlcnJvciAocmV0cnkgbmV4dCBjeWNsZSk6IHt0eXBlKGUpLl9fbmFtZV9ffSIsIGZsdXNoPVRydWUpCgoKZGVmIF9wdXJnZV9sb29wKCk6CiAgICB3aGlsZSBUcnVlOgogICAgICAgIHRpbWUuc2xlZXAoUFVSR0VfSU5URVJWQUwpCiAgICAgICAgX3B1cmdlX3dhY2xpX3N0b3JlKCkKCgpjbGFzcyBIKEJhc2VIVFRQUmVxdWVzdEhhbmRsZXIpOgogICAgZGVmIGxvZ19tZXNzYWdlKHNlbGYsICphKTogICMgZGVmYXVsdCByZXF1ZXN0IGxvZ2dpbmcgbGVha3MgcGF0aHMvaXBzOyBzaWxlbmNlCiAgICAgICAgcGFzcwoKICAgIGRlZiBfb2soc2VsZik6CiAgICAgICAgcmV0dXJuIGJvb2woVE9LRU4pIGFuZCBzZWxmLmhlYWRlcnMuZ2V0KCJBdXRob3JpemF0aW9uIiwgIiIpID09ICJCZWFyZXIgIiArIFRPS0VOCgogICAgZGVmIF9zZW5kKHNlbGYsIGNvZGUsIG9iaik6CiAgICAgICAgYiA9IGpzb24uZHVtcHMob2JqLCBlbnN1cmVfYXNjaWk9RmFsc2UpLmVuY29kZSgpCiAgICAgICAgc2VsZi5zZW5kX3Jlc3BvbnNlKGNvZGUpCiAgICAgICAgc2VsZi5zZW5kX2hlYWRlcigiQ29udGVudC1UeXBlIiwgImFwcGxpY2F0aW9uL2pzb24iKQogICAgICAgIHNlbGYuc2VuZF9oZWFkZXIoIkNvbnRlbnQtTGVuZ3RoIiwgc3RyKGxlbihiKSkpCiAgICAgICAgc2VsZi5lbmRfaGVhZGVycygpCiAgICAgICAgc2VsZi53ZmlsZS53cml0ZShiKQoKICAgIGRlZiBfYm9keShzZWxmKToKICAgICAgICBuID0gaW50KHNlbGYuaGVhZGVycy5nZXQoIkNvbnRlbnQtTGVuZ3RoIiwgIjAiKSkKICAgICAgICByZXR1cm4gc2VsZi5yZmlsZS5yZWFkKG4pIGlmIG4gZWxzZSBiInt9IgoKICAgIGRlZiBkb19HRVQoc2VsZik6CiAgICAgICAgaWYgc2VsZi5wYXRoID09ICIvaGVhbHRoIjoKICAgICAgICAgICAgc3QgPSBzdWJwcm9jZXNzLnJ1bihbIndhY2xpIiwgIi0tc3RvcmUiLCAiL2RhdGEvc3RvcmUiLCAiYXV0aCIsICJzdGF0dXMiXSwgY2FwdHVyZV9vdXRwdXQ9VHJ1ZSwgdGV4dD1UcnVlKQogICAgICAgICAgICBvdXQgPSAoc3Quc3Rkb3V0IG9yICIiKSArIChzdC5zdGRlcnIgb3IgIiIpCiAgICAgICAgICAgIHBhaXJlZCA9IG5vdCBhbnkoeCBpbiBvdXQubG93ZXIoKSBmb3IgeCBpbiAoIm5vdCBhdXRoZW50aWNhdGVkIiwgIm5vIHNlc3Npb24iLCAicnVuIGB3YWNsaSBhdXRoYCIpKQogICAgICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCgyMDAsIHsib2siOiBUcnVlLCAicGFpcmVkIjogcGFpcmVkLCAidHJhY2tlZCI6IGxlbihBTExPVyksICJzZXEiOiBfc2VxLCAic3RhdHMiOiBTVEFUUywgInYiOiAiMi4yLWZ1bGwifSkKICAgICAgICBpZiBzZWxmLnBhdGguc3RhcnRzd2l0aCgiL21lc3NhZ2VzIik6CiAgICAgICAgICAgIGlmIG5vdCBzZWxmLl9vaygpOgogICAgICAgICAgICAgICAgcmV0dXJuIHNlbGYuX3NlbmQoNDAxLCB7ImVycm9yIjogInVuYXV0aG9yaXplZCJ9KQogICAgICAgICAgICBmcm9tIHVybGxpYi5wYXJzZSBpbXBvcnQgdXJscGFyc2UsIHBhcnNlX3FzCiAgICAgICAgICAgIHEgPSBwYXJzZV9xcyh1cmxwYXJzZShzZWxmLnBhdGgpLnF1ZXJ5KQogICAgICAgICAgICBzaW5jZSA9IGludChxLmdldCgic2luY2UiLCBbIjAiXSlbMF0pCiAgICAgICAgICAgIHJvd3MgPSBfcmVhZF90cmFja2VkKHNpbmNlKQogICAgICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCgyMDAsIHsicm93cyI6IHJvd3MsICJzZXEiOiBfc2VxfSkKICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCg0MDQsIHsiZXJyb3IiOiAibm90IGZvdW5kIn0pCgogICAgZGVmIGRvX1BPU1Qoc2VsZik6CiAgICAgICAgcmF3ID0gc2VsZi5fYm9keSgpCiAgICAgICAgIyB3ZWJob29rIGxhbmU6IHNpZ25lZCBieSB3YWNsaSBzeW5jLCBsb2NhbGhvc3Qg4oCUIGNvbnRlbnQgTkVWRVIgbG9nZ2VkCiAgICAgICAgaWYgc2VsZi5wYXRoID09ICIvaG9vayI6CiAgICAgICAgICAgIHNpZyA9IHNlbGYuaGVhZGVycy5nZXQoIlgtV2FjbGktU2lnbmF0dXJlIiwgIiIpCiAgICAgICAgICAgIHdhbnQgPSAic2hhMjU2PSIgKyBobWFjLm5ldyhIT09LX1NFQ1JFVC5lbmNvZGUoKSwgcmF3LCBoYXNobGliLnNoYTI1NikuaGV4ZGlnZXN0KCkKICAgICAgICAgICAgaWYgbm90IEhPT0tfU0VDUkVUIG9yIG5vdCBobWFjLmNvbXBhcmVfZGlnZXN0KHNpZywgd2FudCk6CiAgICAgICAgICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCg0MDEsIHsiZXJyb3IiOiAiYmFkIHNpZ25hdHVyZSJ9KQogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBldnQgPSBqc29uLmxvYWRzKHJhdykKICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICAgIHJldHVybiBzZWxmLl9zZW5kKDQwMCwgeyJlcnJvciI6ICJiYWQganNvbiJ9KQogICAgICAgICAgICBpZiBldnQuZ2V0KCJFdmVudFR5cGUiKTogICAgICAgICAgIyByZWNlaXB0cy9wcmVzZW5jZTogbm90IHN0b3JlZAogICAgICAgICAgICAgICAgcmV0dXJuIHNlbGYuX3NlbmQoMjAwLCB7Im9rIjogVHJ1ZX0pCiAgICAgICAgICAgIGNoYXQgPSBldnQuZ2V0KCJDaGF0IiwgIiIpCiAgICAgICAgICAgIFNUQVRTWyJob29rX21zZ3MiXSArPSAxCiAgICAgICAgICAgIGlmIF9hbGxvd2VkKGNoYXQpOgogICAgICAgICAgICAgICAgaWYgY2hhdC5lbmRzd2l0aCgiQGxpZCIpOgogICAgICAgICAgICAgICAgICAgIFNUQVRTWyJsaWRfcmVzb2x2ZWQiXSArPSAxCiAgICAgICAgICAgICAgICBfYXBwZW5kX3RyYWNrZWQoZXZ0KQogICAgICAgICAgICAgICAgU1RBVFNbInRyYWNrZWQiXSArPSAxCiAgICAgICAgICAgICAgICBTVEFUU1sibGFzdF90cmFja2VkX2F0Il0gPSBpbnQodGltZS50aW1lKCkpCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBfY291bnRfZHJvcChjaGF0KQogICAgICAgICAgICAjIG5vIG1hdGNoIOKGkiBmYWxscyB0aHJvdWdoIHVud3JpdHRlbiwgYnkgbGF3CiAgICAgICAgICAgIHJldHVybiBzZWxmLl9zZW5kKDIwMCwgeyJvayI6IFRydWV9KQoKICAgICAgICBpZiBub3Qgc2VsZi5fb2soKToKICAgICAgICAgICAgcmV0dXJuIHNlbGYuX3NlbmQoNDAxLCB7ImVycm9yIjogInVuYXV0aG9yaXplZCJ9KQogICAgICAgIGJvZHkgPSBqc29uLmxvYWRzKHJhdyBvciBiInt9IikKCiAgICAgICAgaWYgc2VsZi5wYXRoID09ICIvYWxsb3dsaXN0IjoKICAgICAgICAgICAgamlkcyA9IGJvZHkuZ2V0KCJqaWRzIikKICAgICAgICAgICAgaWYgbm90IGlzaW5zdGFuY2UoamlkcywgbGlzdCk6CiAgICAgICAgICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCg0MDAsIHsiZXJyb3IiOiAibWlzc2luZyAnamlkcycgbGlzdCJ9KQogICAgICAgICAgICBfc2V0X2FsbG93bGlzdChqaWRzKQogICAgICAgICAgICBfcHVyZ2Vfd2FjbGlfc3RvcmUoKQogICAgICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCgyMDAsIHsib2siOiBUcnVlLCAidHJhY2tlZCI6IGxlbihBTExPVyl9KQoKICAgICAgICB0byA9IGJvZHkuZ2V0KCJ0byIpCiAgICAgICAgaWYgbm90IHRvOgogICAgICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCg0MDAsIHsiZXJyb3IiOiAibWlzc2luZyAndG8nIn0pCiAgICAgICAgdHJ5OgogICAgICAgICAgICBpZiBzZWxmLnBhdGggPT0gIi9zZW5kIjoKICAgICAgICAgICAgICAgIGNtZCA9IFsid2FjbGkiLCAiLS1zdG9yZSIsICIvZGF0YS9zdG9yZSIsICJzZW5kIiwgInRleHQiLCAiLS10byIsIHRvLCAiLS1tZXNzYWdlIiwgYm9keS5nZXQoInRleHQiLCAiIiksICItLWpzb24iXQogICAgICAgICAgICBlbGlmIHNlbGYucGF0aCA9PSAiL3NlbmQtZmlsZSI6CiAgICAgICAgICAgICAgICBkYXRhID0gYmFzZTY0LmI2NGRlY29kZShib2R5LmdldCgiZmlsZUJhc2U2NCIsICIiKSkKICAgICAgICAgICAgICAgIHRmID0gdGVtcGZpbGUuTmFtZWRUZW1wb3JhcnlGaWxlKGRlbGV0ZT1GYWxzZSwgc3VmZml4PSJfIiArIGJvZHkuZ2V0KCJmaWxlbmFtZSIsICJmaWxlLmJpbiIpKQogICAgICAgICAgICAgICAgdGYud3JpdGUoZGF0YSkKICAgICAgICAgICAgICAgIHRmLmNsb3NlKCkKICAgICAgICAgICAgICAgIGNtZCA9IFsid2FjbGkiLCAiLS1zdG9yZSIsICIvZGF0YS9zdG9yZSIsICJzZW5kIiwgImZpbGUiLCAiLS10byIsIHRvLCAiLS1maWxlIiwgdGYubmFtZSwgIi0tY2FwdGlvbiIsIGJvZHkuZ2V0KCJjYXB0aW9uIiwgIiIpLCAiLS1qc29uIl0KICAgICAgICAgICAgZWxzZToKICAgICAgICAgICAgICAgIHJldHVybiBzZWxmLl9zZW5kKDQwNCwgeyJlcnJvciI6ICJub3QgZm91bmQifSkKICAgICAgICAgICAgciA9IHN1YnByb2Nlc3MucnVuKGNtZCwgY2FwdHVyZV9vdXRwdXQ9VHJ1ZSwgdGV4dD1UcnVlLCB0aW1lb3V0PTE4MCkKICAgICAgICAgICAgcmV0dXJuIHNlbGYuX3NlbmQoMjAwIGlmIHIucmV0dXJuY29kZSA9PSAwIGVsc2UgNTAyLCB7InJjIjogci5yZXR1cm5jb2RlLCAic3Rkb3V0Ijogci5zdGRvdXQsICJzdGRlcnIiOiByLnN0ZGVycn0pCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICByZXR1cm4gc2VsZi5fc2VuZCg1MDAsIHsiZXJyb3IiOiBzdHIoZSl9KQoKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBvcy5tYWtlZGlycyhDT05GX0RJUiwgZXhpc3Rfb2s9VHJ1ZSkKICAgIF9pbml0X3NlcSgpCiAgICB0aHJlYWRpbmcuVGhyZWFkKHRhcmdldD1fcHVyZ2VfbG9vcCwgZGFlbW9uPVRydWUpLnN0YXJ0KCkKICAgIHByaW50KGYiW3NoaW1dIHYyIGxpc3RlbmluZyBvbiA6e1BPUlR9ICh0cmFja2VkIGppZHM6IHtsZW4oQUxMT1cpfSkiLCBmbHVzaD1UcnVlKQogICAgVGhyZWFkaW5nSFRUUFNlcnZlcigoIjAuMC4wLjAiLCBQT1JUKSwgSCkuc2VydmVfZm9yZXZlcigpCg==
+#!/usr/bin/env python3
+"""wacli bridge shim v2 — send + tracked-contact read lanes.
+
+Lanes:
+  SEND (unchanged contract): POST /send {to,text} | /send-file {to,fileBase64,
+    filename,caption} — bearer-gated, execs `wacli send` (delegated to the
+    running sync --follow via its socket).
+  READ (new): wacli sync posts every live message to /hook (localhost only,
+    HMAC-signed). The allowlist filter runs BEFORE any write: messages whose
+    chat JID is on the allowlist append to the tracked store
+    (/data/config/tracked.jsonl); everything else is discarded in memory.
+    GET /messages?since=<seq> serves tracked rows. POST /allowlist replaces
+    the allowlist atomically (and prunes tracked rows that fell off it).
+  PRIVACY PURGE: a background thread deletes non-allowlisted chat/message rows
+    from wacli's own store (wacli.db, WAL) so nothing outside the tracked
+    list persists on this volume. Fail-closed: purge errors are logged
+    (content-free) and retried next cycle; they never crash the shim.
+
+Logs NEVER contain message content or non-tracked identifiers — counts and
+tracked JIDs only.
+"""
+import os, json, base64, tempfile, subprocess, threading, time, sqlite3, hmac, hashlib
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+TOKEN = os.environ.get("GERMANICUS_WACLI_SEND_TOKEN", "")
+HOOK_SECRET = os.environ.get("WACLI_WEBHOOK_SECRET", "")
+PORT = int(os.environ.get("PORT", "8080"))
+CONF_DIR = os.environ.get("SHIM_CONF_DIR", "/data/config")
+ALLOWLIST_PATH = os.path.join(CONF_DIR, "allowlist.json")
+TRACKED_PATH = os.path.join(CONF_DIR, "tracked.jsonl")
+WACLI_DB = os.environ.get("WACLI_DB", "/data/store/wacli.db")
+PURGE_INTERVAL = int(os.environ.get("PURGE_INTERVAL_SEC", "600"))
+
+_lock = threading.Lock()          # guards allowlist + tracked store
+_seq = 0                          # monotonically increasing row id
+
+
+def _load_allowlist():
+    try:
+        with open(ALLOWLIST_PATH) as f:
+            return set(json.load(f).get("jids", []))
+    except Exception:
+        return set()
+
+
+def _bare(jid):
+    """15551234567@s.whatsapp.net -> 15551234567 (match on bare number too)."""
+    return jid.split("@", 1)[0].split(":", 1)[0] if jid else ""
+
+
+ALLOW = _load_allowlist()
+
+
+SESSION_DB = os.environ.get("WACLI_SESSION_DB", "/data/store/session.db")
+_lid_cache = {}                   # lid user -> (pn user | "", expiresAt)
+# privacy-safe drop counters: COUNTS ONLY, never identifiers or content
+STATS = {"hook_msgs": 0, "tracked": 0, "drop_pn": 0, "drop_lid": 0,
+         "drop_lid_unresolved": 0, "drop_group": 0, "drop_other": 0,
+         "lid_resolved": 0, "last_tracked_at": None, "since": int(time.time())}
+
+
+def _lid_lookup(lid_user):
+    """WhatsApp hidden ID (LID) -> phone-number user, via whatsmeow's own
+    lid map in session.db (read-only). Cached 5 min; '' when unknown."""
+    now = time.time()
+    hit = _lid_cache.get(lid_user)
+    if hit and hit[1] > now:
+        return hit[0]
+    pn = ""
+    try:
+        con = sqlite3.connect(f"file:{SESSION_DB}?mode=ro", uri=True, timeout=2)
+        try:
+            row = con.execute("SELECT pn FROM whatsmeow_lid_map WHERE lid=?", (lid_user,)).fetchone()
+            pn = (row[0] if row else "") or ""
+        finally:
+            con.close()
+    except Exception:
+        pn = ""
+    _lid_cache[lid_user] = (pn, now + 300)
+    return pn
+
+
+def _canonical(chat_jid):
+    """Return the phone-number JID for a @lid chat when the map knows it."""
+    if chat_jid and chat_jid.endswith("@lid"):
+        pn = _lid_lookup(_bare(chat_jid))
+        if pn:
+            return pn + "@s.whatsapp.net"
+    return chat_jid
+
+
+def _allowed(chat_jid):
+    if not chat_jid:
+        return False
+    bares = {_bare(j) for j in ALLOW}
+    if chat_jid in ALLOW or _bare(chat_jid) in bares:
+        return True
+    c = _canonical(chat_jid)
+    return c != chat_jid and _bare(c) in bares
+
+
+def _count_drop(chat_jid):
+    j = chat_jid or ""
+    if j.endswith("@g.us"):
+        STATS["drop_group"] += 1
+    elif j.endswith("@lid"):
+        STATS["drop_lid" if _canonical(j) != j else "drop_lid_unresolved"] += 1
+    elif j.endswith("@s.whatsapp.net"):
+        STATS["drop_pn"] += 1
+    else:
+        STATS["drop_other"] += 1
+
+
+def _init_seq():
+    global _seq
+    try:
+        with open(TRACKED_PATH) as f:
+            for line in f:
+                try:
+                    _seq = max(_seq, json.loads(line).get("seq", 0))
+                except Exception:
+                    pass
+    except FileNotFoundError:
+        pass
+
+
+def _append_tracked(evt):
+    global _seq
+    with _lock:
+        _seq += 1
+        row = {
+            "seq": _seq,
+            "chat": _canonical(evt.get("Chat")),
+            "rawChat": evt.get("Chat"),
+            "id": evt.get("ID"),
+            "sender": evt.get("SenderJID"),
+            "ts": evt.get("Timestamp"),
+            "fromMe": bool(evt.get("FromMe")),
+            "text": evt.get("Text", ""),
+            "chatName": evt.get("ChatName", ""),
+            "media": (evt.get("Media") or {}).get("Type") if evt.get("Media") else None,
+        }
+        # v2.2: keep EVERYTHING the parsed message carries, not just Text.
+        # Reactions, replies, edits, deletes, captions, locations, polls were
+        # silently dropped before (empty rows from the contact, 2026-10-01).
+        m = evt.get("Media") or {}
+        extra = {
+            "caption": m.get("Caption") or None,
+            "filename": m.get("Filename") or None,
+            "mime": m.get("MimeType") or None,
+            "replyToId": evt.get("ReplyToID") or None,
+            "replyToSender": evt.get("ReplyToSenderJID") or None,
+            "replyToText": evt.get("ReplyToDisplay") or None,
+            "reaction": evt.get("ReactionEmoji") or None,
+            "reactionToId": evt.get("ReactionToID") or None,
+            "edited": bool(evt.get("Edited")) or None,
+            "revoked": bool(evt.get("Revoked")) or None,
+            "forwarded": bool(evt.get("IsForwarded")) or None,
+            "location": evt.get("Location") or None,
+            "poll": evt.get("Poll") or None,
+            "pollVote": evt.get("PollVote") or None,
+            "pushName": evt.get("PushName") or None,
+            "unhandled": evt.get("UnhandledPayload") or None,
+        }
+        row.update({k: v for k, v in extra.items() if v is not None})
+        with open(TRACKED_PATH, "a") as f:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return row
+
+
+def _read_tracked(since):
+    rows = []
+    try:
+        with _lock:
+            with open(TRACKED_PATH) as f:
+                for line in f:
+                    try:
+                        r = json.loads(line)
+                        if r.get("seq", 0) > since:
+                            rows.append(r)
+                    except Exception:
+                        pass
+    except FileNotFoundError:
+        pass
+    return rows
+
+
+def _set_allowlist(jids):
+    global ALLOW
+    with _lock:
+        tmp = ALLOWLIST_PATH + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump({"jids": sorted(set(jids))}, f)
+        os.replace(tmp, ALLOWLIST_PATH)
+        ALLOW = set(jids)
+        # prune tracked rows that fell off the list
+        kept, dropped = [], 0
+        try:
+            with open(TRACKED_PATH) as f:
+                for line in f:
+                    try:
+                        r = json.loads(line)
+                        if _allowed(r.get("chat", "")):
+                            kept.append(line)
+                        else:
+                            dropped += 1
+                    except Exception:
+                        dropped += 1
+            with open(TRACKED_PATH + ".tmp", "w") as f:
+                f.writelines(kept)
+            os.replace(TRACKED_PATH + ".tmp", TRACKED_PATH)
+        except FileNotFoundError:
+            pass
+    print(f"[shim] allowlist set: {len(ALLOW)} jids, pruned {dropped} rows", flush=True)
+
+
+def _purge_wacli_store():
+    """Delete non-allowlisted chat content from wacli's own db. Local only."""
+    if not os.path.exists(WACLI_DB):
+        return
+    try:
+        con = sqlite3.connect(WACLI_DB, timeout=10)
+        con.execute("PRAGMA busy_timeout=10000")
+        cur = con.execute("SELECT DISTINCT chat_jid FROM messages")
+        targets = [r[0] for r in cur.fetchall() if r[0] and not _allowed(r[0])]
+        total = 0
+        for jid in targets:
+            c = con.execute("DELETE FROM messages WHERE chat_jid=?", (jid,))
+            total += c.rowcount
+            con.commit()
+        # FTS + chats rows best-effort; schema-dependent, fail silently per table
+        for stmt, args in [
+            ("DELETE FROM chats WHERE jid NOT IN (SELECT DISTINCT chat_jid FROM messages)", ()),
+        ]:
+            try:
+                con.execute(stmt, args); con.commit()
+            except sqlite3.Error:
+                pass
+        con.close()
+        if total:
+            print(f"[shim] purge: removed {total} non-tracked message rows ({len(targets)} chats)", flush=True)
+    except Exception as e:
+        print(f"[shim] purge error (retry next cycle): {type(e).__name__}", flush=True)
+
+
+def _purge_loop():
+    while True:
+        time.sleep(PURGE_INTERVAL)
+        _purge_wacli_store()
+
+
+class H(BaseHTTPRequestHandler):
+    def log_message(self, *a):  # default request logging leaks paths/ips; silence
+        pass
+
+    def _ok(self):
+        return bool(TOKEN) and self.headers.get("Authorization", "") == "Bearer " + TOKEN
+
+    def _send(self, code, obj):
+        b = json.dumps(obj, ensure_ascii=False).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(b)))
+        self.end_headers()
+        self.wfile.write(b)
+
+    def _body(self):
+        n = int(self.headers.get("Content-Length", "0"))
+        return self.rfile.read(n) if n else b"{}"
+
+    def do_GET(self):
+        if self.path == "/health":
+            st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
+            out = (st.stdout or "") + (st.stderr or "")
+            paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.2-full"})
+        if self.path.startswith("/messages"):
+            if not self._ok():
+                return self._send(401, {"error": "unauthorized"})
+            from urllib.parse import urlparse, parse_qs
+            q = parse_qs(urlparse(self.path).query)
+            since = int(q.get("since", ["0"])[0])
+            rows = _read_tracked(since)
+            return self._send(200, {"rows": rows, "seq": _seq})
+        return self._send(404, {"error": "not found"})
+
+    def do_POST(self):
+        raw = self._body()
+        # webhook lane: signed by wacli sync, localhost — content NEVER logged
+        if self.path == "/hook":
+            sig = self.headers.get("X-Wacli-Signature", "")
+            want = "sha256=" + hmac.new(HOOK_SECRET.encode(), raw, hashlib.sha256).hexdigest()
+            if not HOOK_SECRET or not hmac.compare_digest(sig, want):
+                return self._send(401, {"error": "bad signature"})
+            try:
+                evt = json.loads(raw)
+            except Exception:
+                return self._send(400, {"error": "bad json"})
+            if evt.get("EventType"):          # receipts/presence: not stored
+                return self._send(200, {"ok": True})
+            chat = evt.get("Chat", "")
+            STATS["hook_msgs"] += 1
+            if _allowed(chat):
+                if chat.endswith("@lid"):
+                    STATS["lid_resolved"] += 1
+                _append_tracked(evt)
+                STATS["tracked"] += 1
+                STATS["last_tracked_at"] = int(time.time())
+            else:
+                _count_drop(chat)
+            # no match → falls through unwritten, by law
+            return self._send(200, {"ok": True})
+
+        if not self._ok():
+            return self._send(401, {"error": "unauthorized"})
+        body = json.loads(raw or b"{}")
+
+        if self.path == "/allowlist":
+            jids = body.get("jids")
+            if not isinstance(jids, list):
+                return self._send(400, {"error": "missing 'jids' list"})
+            _set_allowlist(jids)
+            _purge_wacli_store()
+            return self._send(200, {"ok": True, "tracked": len(ALLOW)})
+
+        to = body.get("to")
+        if not to:
+            return self._send(400, {"error": "missing 'to'"})
+        try:
+            if self.path == "/send":
+                cmd = ["wacli", "--store", "/data/store", "send", "text", "--to", to, "--message", body.get("text", ""), "--json"]
+            elif self.path == "/send-file":
+                data = base64.b64decode(body.get("fileBase64", ""))
+                tf = tempfile.NamedTemporaryFile(delete=False, suffix="_" + body.get("filename", "file.bin"))
+                tf.write(data)
+                tf.close()
+                cmd = ["wacli", "--store", "/data/store", "send", "file", "--to", to, "--file", tf.name, "--caption", body.get("caption", ""), "--json"]
+            else:
+                return self._send(404, {"error": "not found"})
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+            return self._send(200 if r.returncode == 0 else 502, {"rc": r.returncode, "stdout": r.stdout, "stderr": r.stderr})
+        except Exception as e:
+            return self._send(500, {"error": str(e)})
+
+
+if __name__ == "__main__":
+    os.makedirs(CONF_DIR, exist_ok=True)
+    _init_seq()
+    threading.Thread(target=_purge_loop, daemon=True).start()
+    print(f"[shim] v2 listening on :{PORT} (tracked jids: {len(ALLOW)})", flush=True)
+    ThreadingHTTPServer(("0.0.0.0", PORT), H).serve_forever()
