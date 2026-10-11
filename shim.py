@@ -50,6 +50,18 @@ def _bare(jid):
 
 ALLOW = _load_allowlist()
 
+# v2.3 (Amitay 2026-10-12): every NEW number that messages him is tracked
+# automatically. "New" = 1:1 chat, incoming, not saved in his phone contacts.
+AUTO_PATH = os.path.join(CONF_DIR, "auto-tracked.json")
+def _load_auto():
+    try:
+        with open(AUTO_PATH) as f:
+            return set(json.load(f).get("jids", []))
+    except Exception:
+        return set()
+AUTO = _load_auto()
+ALLOW |= AUTO
+
 
 SESSION_DB = os.environ.get("WACLI_SESSION_DB", "/data/store/session.db")
 _lid_cache = {}                   # lid user -> (pn user | "", expiresAt)
@@ -97,6 +109,45 @@ def _allowed(chat_jid):
         return True
     c = _canonical(chat_jid)
     return c != chat_jid and _bare(c) in bares
+
+
+def _is_saved_contact(pn_jid, raw_jid):
+    """True when the number is saved in the phone's address book (whatsmeow
+    contacts carry first/full name only for saved contacts). Fail SAFE: on any
+    read error answer True, so nothing is auto-tracked by accident."""
+    try:
+        con = sqlite3.connect(f"file:{SESSION_DB}?mode=ro", uri=True, timeout=2)
+        try:
+            rows = con.execute(
+                "SELECT first_name, full_name FROM whatsmeow_contacts WHERE their_jid IN (?, ?)",
+                (pn_jid, raw_jid)).fetchall()
+        finally:
+            con.close()
+        return any((r[0] or "").strip() or (r[1] or "").strip() for r in rows)
+    except Exception:
+        return True
+
+
+def _maybe_auto_track(evt):
+    """Add an unknown incoming 1:1 number to the allowlist. Returns True if added."""
+    global ALLOW
+    raw = evt.get("Chat", "") or ""
+    if evt.get("FromMe") or raw.endswith("@g.us") or "broadcast" in raw or "newsletter" in raw:
+        return False
+    pn = _canonical(raw)
+    if not pn.endswith("@s.whatsapp.net"):
+        return False                      # unresolved LID: cannot name a number
+    if _is_saved_contact(pn, raw):
+        return False
+    with _lock:
+        AUTO.add(pn)
+        ALLOW.add(pn)
+        tmp = AUTO_PATH + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump({"jids": sorted(AUTO)}, f)
+        os.replace(tmp, AUTO_PATH)
+    STATS["auto_tracked"] = STATS.get("auto_tracked", 0) + 1
+    return True
 
 
 def _count_drop(chat_jid):
@@ -160,6 +211,7 @@ def _append_tracked(evt):
             "poll": evt.get("Poll") or None,
             "pollVote": evt.get("PollVote") or None,
             "pushName": evt.get("PushName") or None,
+            "autoTracked": evt.get("AutoTracked") or None,
             "unhandled": evt.get("UnhandledPayload") or None,
         }
         row.update({k: v for k, v in extra.items() if v is not None})
@@ -192,7 +244,7 @@ def _set_allowlist(jids):
         with open(tmp, "w") as f:
             json.dump({"jids": sorted(set(jids))}, f)
         os.replace(tmp, ALLOWLIST_PATH)
-        ALLOW = set(jids)
+        ALLOW = set(jids) | AUTO
         # prune tracked rows that fell off the list
         kept, dropped = [], 0
         try:
@@ -273,7 +325,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.2-full"})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.3-auto"})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -300,7 +352,12 @@ class H(BaseHTTPRequestHandler):
                 return self._send(200, {"ok": True})
             chat = evt.get("Chat", "")
             STATS["hook_msgs"] += 1
-            if _allowed(chat):
+            auto = False
+            if not _allowed(chat):
+                auto = _maybe_auto_track(evt)
+            if auto or _allowed(chat):
+                if auto:
+                    evt = dict(evt, AutoTracked=True)
                 if chat.endswith("@lid"):
                     STATS["lid_resolved"] += 1
                 _append_tracked(evt)
