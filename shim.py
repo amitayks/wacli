@@ -349,7 +349,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.4-groups"})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.5-groups"})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -358,6 +358,18 @@ class H(BaseHTTPRequestHandler):
             since = int(q.get("since", ["0"])[0])
             rows = _read_tracked(since)
             return self._send(200, {"rows": rows, "seq": _seq})
+        if self.path.startswith("/groups"):
+            # names + JIDs of the account's groups only (no content). For
+            # pinning a group to the allowlist by its exact id. v2.5
+            if not self._ok():
+                return self._send(401, {"error": "unauthorized"})
+            out = {}
+            for args in (["groups", "list", "--json"], ["groups", "list"], ["chats", "list", "--json"]):
+                r = subprocess.run(["wacli", "--store", "/data/store"] + args, capture_output=True, text=True, timeout=120)
+                out[" ".join(args)] = {"rc": r.returncode, "stdout": r.stdout[-60000:], "stderr": r.stderr[-2000:]}
+                if r.returncode == 0 and r.stdout.strip():
+                    break
+            return self._send(200, out)
         return self._send(404, {"error": "not found"})
 
     def do_POST(self):
