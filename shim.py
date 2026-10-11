@@ -364,7 +364,7 @@ class H(BaseHTTPRequestHandler):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
             out = {}
-            for args in (["groups", "list", "--json"], ["groups", "list"], ["chats", "list", "--json"]):
+            for args in (["groups", "list", "--json", "--limit", "2000"], ["groups", "list", "--json"], ["chats", "list", "--json"]):
                 r = subprocess.run(["wacli", "--store", "/data/store"] + args, capture_output=True, text=True, timeout=120)
                 out[" ".join(args)] = {"rc": r.returncode, "stdout": r.stdout[-60000:], "stderr": r.stderr[-2000:]}
                 if r.returncode == 0 and r.stdout.strip():
