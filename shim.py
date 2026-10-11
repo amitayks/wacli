@@ -104,7 +104,9 @@ def _canonical(chat_jid):
 def _allowed(chat_jid):
     if not chat_jid:
         return False
-    bares = {_bare(j) for j in ALLOW}
+    if chat_jid.startswith("name:"):
+        return False
+    bares = {_bare(j) for j in ALLOW if not j.startswith("name:")}
     if chat_jid in ALLOW or _bare(chat_jid) in bares:
         return True
     c = _canonical(chat_jid)
@@ -128,10 +130,32 @@ def _is_saved_contact(pn_jid, raw_jid):
         return True
 
 
+def _group_name_match(evt):
+    """Groups tracked by NAME: allowlist entries 'name:<group name>' (case-
+    insensitive, exact). On first match the group JID itself joins AUTO."""
+    raw = evt.get("Chat", "") or ""
+    if not raw.endswith("@g.us"):
+        return False
+    nm = (evt.get("ChatName") or "").strip().lower()
+    names = {j[5:].strip().lower() for j in ALLOW if j.startswith("name:")}
+    if not nm or nm not in names:
+        return False
+    with _lock:
+        AUTO.add(raw)
+        ALLOW.add(raw)
+        tmp = AUTO_PATH + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump({"jids": sorted(AUTO)}, f)
+        os.replace(tmp, AUTO_PATH)
+    return True
+
+
 def _maybe_auto_track(evt):
     """Add an unknown incoming 1:1 number to the allowlist. Returns True if added."""
     global ALLOW
     raw = evt.get("Chat", "") or ""
+    if _group_name_match(evt):
+        return True
     if evt.get("FromMe") or raw.endswith("@g.us") or "broadcast" in raw or "newsletter" in raw:
         return False
     pn = _canonical(raw)
@@ -325,7 +349,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.3-auto"})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.4-groups"})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
