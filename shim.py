@@ -349,7 +349,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.6-media"})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.6.1-media"})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -375,9 +375,8 @@ class H(BaseHTTPRequestHandler):
             d = tempfile.mkdtemp()
             out = os.path.join(d, "m")
             tries = []
-            for args in (["media", "download", "--chat", chat, "--id", mid, "--output", out],
-                         ["media", "download", "--chat", chat, "--id", mid, "--out", out],
-                         ["media", "download", "--chat", chat, "--message", mid, "--output", out]):
+            for args in (["--read-only", "media", "download", "--chat", chat, "--id", mid, "--output", out],
+                         ["--read-only", "media", "download", "--chat", chat, "--id", mid, "--output", d]):
                 r = subprocess.run(["wacli", "--store", "/data/store"] + args, capture_output=True, text=True, timeout=120)
                 tries.append({"rc": r.returncode, "err": (r.stderr or r.stdout)[-400:]})
                 files = [os.path.join(dp, f) for dp, _, fs in os.walk(d) for f in fs]
