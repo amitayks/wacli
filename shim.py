@@ -349,7 +349,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.5-groups"})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.6-media"})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -358,6 +358,36 @@ class H(BaseHTTPRequestHandler):
             since = int(q.get("since", ["0"])[0])
             rows = _read_tracked(since)
             return self._send(200, {"rows": rows, "seq": _seq})
+        if self.path.startswith("/media"):
+            # v2.6: download one TRACKED message's media (voice notes) -> base64.
+            # Allowlisted chats only; nothing persisted beyond a temp file.
+            if not self._ok():
+                return self._send(401, {"error": "unauthorized"})
+            from urllib.parse import urlparse, parse_qs
+            q = parse_qs(urlparse(self.path).query)
+            chat = q.get("chat", [""])[0]; mid = q.get("id", [""])[0]
+            if q.get("help"):
+                h = subprocess.run(["wacli", "--store", "/data/store", "media", "--help"], capture_output=True, text=True, timeout=30)
+                h2 = subprocess.run(["wacli", "--store", "/data/store", "media", "download", "--help"], capture_output=True, text=True, timeout=30)
+                return self._send(200, {"media": h.stdout + h.stderr, "download": h2.stdout + h2.stderr})
+            if not chat or not mid or not _allowed(chat):
+                return self._send(403, {"error": "chat not tracked"})
+            d = tempfile.mkdtemp()
+            out = os.path.join(d, "m")
+            tries = []
+            for args in (["media", "download", "--chat", chat, "--id", mid, "--output", out],
+                         ["media", "download", "--chat", chat, "--id", mid, "--out", out],
+                         ["media", "download", "--chat", chat, "--message", mid, "--output", out]):
+                r = subprocess.run(["wacli", "--store", "/data/store"] + args, capture_output=True, text=True, timeout=120)
+                tries.append({"rc": r.returncode, "err": (r.stderr or r.stdout)[-400:]})
+                files = [os.path.join(dp, f) for dp, _, fs in os.walk(d) for f in fs]
+                if r.returncode == 0 and files:
+                    f = max(files, key=os.path.getsize)
+                    with open(f, "rb") as fh:
+                        b = base64.b64encode(fh.read()).decode()
+                    for x in files: os.remove(x)
+                    return self._send(200, {"ok": True, "b64": b, "name": os.path.basename(f)})
+            return self._send(502, {"error": "download failed", "tries": tries})
         if self.path.startswith("/groups"):
             # names + JIDs of the account's groups only (no content). For
             # pinning a group to the allowlist by its exact id. v2.5
