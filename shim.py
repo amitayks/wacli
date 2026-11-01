@@ -16,6 +16,13 @@ Lanes:
     list persists on this volume. Fail-closed: purge errors are logged
     (content-free) and retried next cycle; they never crash the shim.
 
+ENGAGED GROUPS (v2.7, Amitay 2026-11-01): every group NOT on the allowlist is
+    "engaged" tier. Its messages wait in a rolling buffer (BUF_HOURS, default
+    30 h, then deleted). When Amitay writes in such a group, the group turns
+    active until the end of that Israel day: the last 24 h of its buffer are
+    served as context rows, and every later message that day is served too.
+    Rows carry tier="engaged". Allowlisted groups stay "always" tier.
+
 Logs NEVER contain message content or non-tracked identifiers — counts and
 tracked JIDs only.
 """
@@ -30,6 +37,48 @@ ALLOWLIST_PATH = os.path.join(CONF_DIR, "allowlist.json")
 TRACKED_PATH = os.path.join(CONF_DIR, "tracked.jsonl")
 WACLI_DB = os.environ.get("WACLI_DB", "/data/store/wacli.db")
 PURGE_INTERVAL = int(os.environ.get("PURGE_INTERVAL_SEC", "600"))
+BUF_PATH = os.path.join(CONF_DIR, "groups-buffer.jsonl")
+ACTIVE_PATH = os.path.join(CONF_DIR, "engaged-active.json")
+BUF_HOURS = float(os.environ.get("BUF_HOURS", "30"))
+CONTEXT_HOURS = float(os.environ.get("CONTEXT_HOURS", "24"))
+ENGAGED_ON = os.environ.get("ENGAGED_GROUPS", "1") != "0"
+from datetime import datetime, timezone, timedelta
+try:
+    from zoneinfo import ZoneInfo
+    TZ = ZoneInfo("Asia/Jerusalem")
+except Exception:
+    TZ = timezone(timedelta(hours=2))
+
+
+def _today():
+    return datetime.now(TZ).strftime("%Y-%m-%d")
+
+
+def _load_active():
+    try:
+        with open(ACTIVE_PATH) as f:
+            return dict(json.load(f))
+    except Exception:
+        return {}
+
+
+ACTIVE = _load_active()             # group jid -> Israel date it is active
+
+
+def _save_active():
+    tmp = ACTIVE_PATH + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(ACTIVE, f)
+    os.replace(tmp, ACTIVE_PATH)
+
+
+def _engaged_group(jid):
+    j = jid or ""
+    return ENGAGED_ON and j.endswith("@g.us")
+
+
+def _active_today(jid):
+    return ACTIVE.get(jid) == _today()
 
 _lock = threading.Lock()          # guards allowlist + tracked store
 _seq = 0                          # monotonically increasing row id
@@ -106,6 +155,8 @@ def _allowed(chat_jid):
         return False
     if chat_jid.startswith("name:"):
         return False
+    if _engaged_group(chat_jid) and _active_today(chat_jid):
+        return True
     bares = {_bare(j) for j in ALLOW if not j.startswith("name:")}
     if chat_jid in ALLOW or _bare(chat_jid) in bares:
         return True
@@ -199,12 +250,8 @@ def _init_seq():
         pass
 
 
-def _append_tracked(evt):
-    global _seq
-    with _lock:
-        _seq += 1
-        row = {
-            "seq": _seq,
+def _row_of(evt):
+    return {
             "chat": _canonical(evt.get("Chat")),
             "rawChat": evt.get("Chat"),
             "id": evt.get("ID"),
@@ -215,6 +262,18 @@ def _append_tracked(evt):
             "chatName": evt.get("ChatName", ""),
             "media": (evt.get("Media") or {}).get("Type") if evt.get("Media") else None,
         }
+
+
+def _append_tracked(evt, tier=None, context=False):
+    global _seq
+    with _lock:
+        _seq += 1
+        row = _row_of(evt)
+        row["seq"] = _seq
+        if tier:
+            row["tier"] = tier
+        if context:
+            row["context"] = True
         # v2.2: keep EVERYTHING the parsed message carries, not just Text.
         # Reactions, replies, edits, deletes, captions, locations, polls were
         # silently dropped before (empty rows from the contact, 2026-10-01).
@@ -242,6 +301,68 @@ def _append_tracked(evt):
         with open(TRACKED_PATH, "a") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
     return row
+
+
+def _buffer(evt):
+    rec = {"bufAt": time.time(), "evt": evt}
+    with _lock:
+        with open(BUF_PATH, "a") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    STATS["buffered"] = STATS.get("buffered", 0) + 1
+
+
+def _activate(chat):
+    """Amitay wrote in an engaged group: active until the end of the Israel
+    day; replay the last CONTEXT_HOURS of its buffer as context rows."""
+    ACTIVE[chat] = _today()
+    with _lock:
+        _save_active()
+    cut = time.time() - CONTEXT_HOURS * 3600
+    ctx = []
+    try:
+        with open(BUF_PATH) as f:
+            for line in f:
+                try:
+                    r = json.loads(line)
+                    if r.get("bufAt", 0) >= cut and (r.get("evt") or {}).get("Chat") == chat:
+                        ctx.append(r["evt"])
+                except Exception:
+                    pass
+    except FileNotFoundError:
+        pass
+    for e in ctx:
+        _append_tracked(e, tier="engaged", context=True)
+    STATS["activations"] = STATS.get("activations", 0) + 1
+    print(f"[shim] engaged group active today ({len(ctx)} context rows)", flush=True)
+
+
+def _prune_buffer():
+    cut = time.time() - BUF_HOURS * 3600
+    kept, dropped = [], 0
+    with _lock:
+        try:
+            with open(BUF_PATH) as f:
+                for line in f:
+                    try:
+                        if json.loads(line).get("bufAt", 0) >= cut:
+                            kept.append(line)
+                        else:
+                            dropped += 1
+                    except Exception:
+                        dropped += 1
+            with open(BUF_PATH + ".tmp", "w") as f:
+                f.writelines(kept)
+            os.replace(BUF_PATH + ".tmp", BUF_PATH)
+        except FileNotFoundError:
+            pass
+        today = _today()
+        stale = [j for j, d in ACTIVE.items() if d != today]
+        for j in stale:
+            ACTIVE.pop(j, None)
+        if stale:
+            _save_active()
+    if dropped:
+        print(f"[shim] buffer: removed {dropped} rows older than {BUF_HOURS} h", flush=True)
 
 
 def _read_tracked(since):
@@ -276,7 +397,7 @@ def _set_allowlist(jids):
                 for line in f:
                     try:
                         r = json.loads(line)
-                        if _allowed(r.get("chat", "")):
+                        if r.get("tier") == "engaged" or _allowed(r.get("chat", "")):
                             kept.append(line)
                         else:
                             dropped += 1
@@ -322,6 +443,7 @@ def _purge_wacli_store():
 def _purge_loop():
     while True:
         time.sleep(PURGE_INTERVAL)
+        _prune_buffer()
         _purge_wacli_store()
 
 
@@ -349,7 +471,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.6.1-media"})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.7-groups", "engagedOn": ENGAGED_ON, "activeToday": sum(1 for d in ACTIVE.values() if d == _today())})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -420,12 +542,21 @@ class H(BaseHTTPRequestHandler):
             auto = False
             if not _allowed(chat):
                 auto = _maybe_auto_track(evt)
+            if not auto and not _allowed(chat) and _engaged_group(chat) and "broadcast" not in chat:
+                if evt.get("FromMe"):
+                    _activate(chat)
+                    _append_tracked(evt, tier="engaged")
+                    STATS["engaged"] = STATS.get("engaged", 0) + 1
+                else:
+                    _buffer(evt)
+                return self._send(200, {"ok": True})
             if auto or _allowed(chat):
                 if auto:
                     evt = dict(evt, AutoTracked=True)
                 if chat.endswith("@lid"):
                     STATS["lid_resolved"] += 1
-                _append_tracked(evt)
+                tier = "engaged" if (_engaged_group(chat) and _active_today(chat) and chat not in ALLOW) else None
+                _append_tracked(evt, tier=tier)
                 STATS["tracked"] += 1
                 STATS["last_tracked_at"] = int(time.time())
             else:
