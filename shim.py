@@ -42,6 +42,7 @@ ACTIVE_PATH = os.path.join(CONF_DIR, "engaged-active.json")
 BUF_HOURS = float(os.environ.get("BUF_HOURS", "30"))
 CONTEXT_HOURS = float(os.environ.get("CONTEXT_HOURS", "24"))
 ENGAGED_ON = os.environ.get("ENGAGED_GROUPS", "1") != "0"
+OWNER_NAME = os.environ.get("OWNER_NAME", "").strip().lower()
 from datetime import datetime, timezone, timedelta
 try:
     from zoneinfo import ZoneInfo
@@ -55,9 +56,10 @@ def _today():
 
 
 def _load_active():
+    # v2.7.1: an entry is "<date>|owner"; older entries (agent-triggered) are dropped
     try:
         with open(ACTIVE_PATH) as f:
-            return dict(json.load(f))
+            return {j: d for j, d in dict(json.load(f)).items() if str(d).endswith("|owner")}
     except Exception:
         return {}
 
@@ -78,7 +80,20 @@ def _engaged_group(jid):
 
 
 def _active_today(jid):
-    return ACTIVE.get(jid) == _today()
+    return ACTIVE.get(jid) == _today() + "|owner"
+
+
+def _owner_typed(evt):
+    """v2.7.1: FromMe is also true for agents that send through this account
+    (pushName 'Noa The Shift', id 3EB0...). Only the owner's own messages
+    switch a group on: FromMe, and the pushName is the owner's name when set,
+    else the id is not a linked-bot id."""
+    if not evt.get("FromMe"):
+        return False
+    pn = (evt.get("PushName") or "").strip().lower()
+    if OWNER_NAME:
+        return pn == OWNER_NAME
+    return not str(evt.get("ID") or "").startswith("3EB0")
 
 _lock = threading.Lock()          # guards allowlist + tracked store
 _seq = 0                          # monotonically increasing row id
@@ -314,7 +329,7 @@ def _buffer(evt):
 def _activate(chat):
     """Amitay wrote in an engaged group: active until the end of the Israel
     day; replay the last CONTEXT_HOURS of its buffer as context rows."""
-    ACTIVE[chat] = _today()
+    ACTIVE[chat] = _today() + "|owner"
     with _lock:
         _save_active()
     cut = time.time() - CONTEXT_HOURS * 3600
@@ -356,7 +371,7 @@ def _prune_buffer():
         except FileNotFoundError:
             pass
         today = _today()
-        stale = [j for j, d in ACTIVE.items() if d != today]
+        stale = [j for j, d in ACTIVE.items() if d != today + "|owner"]
         for j in stale:
             ACTIVE.pop(j, None)
         if stale:
@@ -471,7 +486,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.7-groups", "engagedOn": ENGAGED_ON, "activeToday": sum(1 for d in ACTIVE.values() if d == _today())})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.7.1-groups", "ownerNameSet": bool(OWNER_NAME), "engagedOn": ENGAGED_ON, "activeToday": sum(1 for d in ACTIVE.values() if d == _today() + "|owner")})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -543,7 +558,7 @@ class H(BaseHTTPRequestHandler):
             if not _allowed(chat):
                 auto = _maybe_auto_track(evt)
             if not auto and not _allowed(chat) and _engaged_group(chat) and "broadcast" not in chat:
-                if evt.get("FromMe"):
+                if _owner_typed(evt):
                     _activate(chat)
                     _append_tracked(evt, tier="engaged")
                     STATS["engaged"] = STATS.get("engaged", 0) + 1
