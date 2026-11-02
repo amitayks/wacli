@@ -39,8 +39,9 @@ WACLI_DB = os.environ.get("WACLI_DB", "/data/store/wacli.db")
 PURGE_INTERVAL = int(os.environ.get("PURGE_INTERVAL_SEC", "600"))
 BUF_PATH = os.path.join(CONF_DIR, "groups-buffer.jsonl")
 ACTIVE_PATH = os.path.join(CONF_DIR, "engaged-active.json")
-BUF_HOURS = float(os.environ.get("BUF_HOURS", "30"))
-CONTEXT_HOURS = float(os.environ.get("CONTEXT_HOURS", "24"))
+BUF_HOURS = float(os.environ.get("BUF_HOURS", "3"))
+CONTEXT_HOURS = float(os.environ.get("CONTEXT_HOURS", "2"))
+AFTER_HOURS = float(os.environ.get("AFTER_HOURS", "2"))
 ENGAGED_ON = os.environ.get("ENGAGED_GROUPS", "1") != "0"
 OWNER_NAME = os.environ.get("OWNER_NAME", "").strip().lower()
 from datetime import datetime, timezone, timedelta
@@ -56,15 +57,17 @@ def _today():
 
 
 def _load_active():
-    # v2.7.1: an entry is "<date>|owner"; older entries (agent-triggered) are dropped
+    # v2.8: an entry is the expiry time (epoch seconds); older formats are dropped
     try:
         with open(ACTIVE_PATH) as f:
-            return {j: d for j, d in dict(json.load(f)).items() if str(d).endswith("|owner")}
+            now = time.time()
+            return {j: float(v) for j, v in dict(json.load(f)).items()
+                    if isinstance(v, (int, float)) and float(v) > now}
     except Exception:
         return {}
 
 
-ACTIVE = _load_active()             # group jid -> Israel date it is active
+ACTIVE = _load_active()             # group jid -> active-until (epoch s)
 
 
 def _save_active():
@@ -80,7 +83,14 @@ def _engaged_group(jid):
 
 
 def _active_today(jid):
-    return ACTIVE.get(jid) == _today() + "|owner"
+    # name kept for the call sites; v2.8 = active until AFTER_HOURS after the owner's last message
+    return ACTIVE.get(jid, 0) > time.time()
+
+
+def _extend(chat):
+    ACTIVE[chat] = time.time() + AFTER_HOURS * 3600
+    with _lock:
+        _save_active()
 
 
 def _owner_typed(evt):
@@ -329,9 +339,7 @@ def _buffer(evt):
 def _activate(chat):
     """Amitay wrote in an engaged group: active until the end of the Israel
     day; replay the last CONTEXT_HOURS of its buffer as context rows."""
-    ACTIVE[chat] = _today() + "|owner"
-    with _lock:
-        _save_active()
+    _extend(chat)
     cut = time.time() - CONTEXT_HOURS * 3600
     ctx = []
     try:
@@ -370,8 +378,8 @@ def _prune_buffer():
             os.replace(BUF_PATH + ".tmp", BUF_PATH)
         except FileNotFoundError:
             pass
-        today = _today()
-        stale = [j for j, d in ACTIVE.items() if d != today + "|owner"]
+        now = time.time()
+        stale = [j for j, d in ACTIVE.items() if d <= now]
         for j in stale:
             ACTIVE.pop(j, None)
         if stale:
@@ -486,7 +494,7 @@ class H(BaseHTTPRequestHandler):
             st = subprocess.run(["wacli", "--store", "/data/store", "auth", "status"], capture_output=True, text=True)
             out = (st.stdout or "") + (st.stderr or "")
             paired = not any(x in out.lower() for x in ("not authenticated", "no session", "run `wacli auth`"))
-            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.7.1-groups", "ownerNameSet": bool(OWNER_NAME), "engagedOn": ENGAGED_ON, "activeToday": sum(1 for d in ACTIVE.values() if d == _today() + "|owner")})
+            return self._send(200, {"ok": True, "paired": paired, "tracked": len(ALLOW), "seq": _seq, "stats": STATS, "v": "2.8-groups", "ownerNameSet": bool(OWNER_NAME), "engagedOn": ENGAGED_ON, "activeNow": sum(1 for d in ACTIVE.values() if d > time.time()), "windowH": [CONTEXT_HOURS, AFTER_HOURS, BUF_HOURS]})
         if self.path.startswith("/messages"):
             if not self._ok():
                 return self._send(401, {"error": "unauthorized"})
@@ -571,6 +579,8 @@ class H(BaseHTTPRequestHandler):
                 if chat.endswith("@lid"):
                     STATS["lid_resolved"] += 1
                 tier = "engaged" if (_engaged_group(chat) and _active_today(chat) and chat not in ALLOW) else None
+                if tier and _owner_typed(evt):
+                    _extend(chat)
                 _append_tracked(evt, tier=tier)
                 STATS["tracked"] += 1
                 STATS["last_tracked_at"] = int(time.time())
