@@ -24,6 +24,24 @@ if echo "$STATUS" | grep -qiE "not authenticated|no session|run .?wacli auth"; t
     exec tail -f /dev/null
   fi
 else
+  # ONLINE PULSE: WhatsApp warns "this device will log out" when a linked
+  # device never shows as available (quiet mode). On every start, show as
+  # online for WACLI_ONLINE_PULSE_SEC (default 90), then run quiet as usual.
+  PULSE="${WACLI_ONLINE_PULSE_SEC:-90}"
+  if [ "$PULSE" -gt 0 ] 2>/dev/null; then
+    echo "[start] online pulse ${PULSE}s (presence normal)"
+    timeout -s INT "$PULSE" wacli --store "$STORE" sync --follow --max-db-size 512MB \
+      --presence-mode normal \
+      --webhook "http://127.0.0.1:${PORT:-8080}/hook" \
+      --webhook-secret "${WACLI_WEBHOOK_SECRET}" \
+      --webhook-events message \
+      --webhook-allow-private || true
+    sleep 3
+    if [ -f "$STORE/LOCK" ]; then
+      kill -0 "$(cat "$STORE/LOCK" 2>/dev/null)" 2>/dev/null || rm -f "$STORE/LOCK" "$STORE/.send.sock"
+    fi
+    echo "[start] online pulse done"
+  fi
   echo "[start] session found -> sync --follow (webhook -> shim /hook)"
   exec wacli --store "$STORE" sync --follow --max-db-size 512MB \
     --presence-mode quiet \
